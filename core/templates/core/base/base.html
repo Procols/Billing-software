@@ -1,0 +1,15 @@
+{% load static %}
+<html>
+<head>
+    {% block title %} {% endblock title %}
+</head>
+<body>
+    {% include 'core/base/navbar.html' %}
+    <div class="container mt-4">
+        {% block content %}
+        
+        {% endblock %}
+    </div>
+    {% include 'core/base/footer.html' %}
+</body>
+</html>
