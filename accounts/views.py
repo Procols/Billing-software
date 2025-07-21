@@ -1,41 +1,32 @@
+from django.contrib.auth import login, logout
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
-from .forms import SignupForm, LoginForm
-from .models import CustomUser
-from django.views.decorators.csrf import csrf_protect
-
-@csrf_protect
-def signup_view(request):
-    if request.method == 'POST':
-        form = SignupForm(request.POST)
-        if form.is_valid():
-            user = CustomUser.objects.create_user(
-                email=form.cleaned_data['email'],
-                name=form.cleaned_data['name'],
-                password=form.cleaned_data['password']
-            )
-            login(request, user)
-            return redirect('home')  # 🔁 redirect to core:index
-    else:
-        form = SignupForm()
-    return render(request, 'accounts/signup.html', {'form': form})
+from .forms import LoginForm, AssistantCreateForm
 
 def login_view(request):
     if request.method == 'POST':
-        form = LoginForm(request, data=request.POST)
+        form = LoginForm(data=request.POST)
         if form.is_valid():
-            user = authenticate(request,
-                username=form.cleaned_data['username'],
-                password=form.cleaned_data['password'])
-            if user:
-                login(request, user)
-                return redirect('home')  
+            user = form.get_user()
+            login(request, user)  # Log user in, set session
+            if user.role == 'admin':
+                return redirect('core:dashboard')
+            else:
+                # You can create receptionist dashboard or change this redirect
+                return redirect('accounts:login')
     else:
         form = LoginForm()
     return render(request, 'accounts/login.html', {'form': form})
 
-
 def logout_view(request):
     logout(request)
-    return redirect('login')
+    return redirect('accounts:login')
+
+def create_assistant_view(request):
+    if request.method == 'POST':
+        form = AssistantCreateForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('accounts:login')
+    else:
+        form = AssistantCreateForm()
+    return render(request, 'accounts/create_assistant.html', {'form': form})

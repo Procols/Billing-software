@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Create Receptionist - KC Billing</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    /* Use same styles as login.html for consistency */
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+    body, html { height: 100%; background: url('login-bg.jpg') no-repeat center center/cover; filter: saturate(1.5); }
+    .overlay {
+      background-color: rgba(255, 255, 255, 0.9);
+      position: absolute;
+      top: 0; left: 0;
+      height: 100%; width: 100%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .box {
+      background: white;
+      padding: 30px;
+      width: 360px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .box h1 { font-size: 22px; margin-bottom: 5px; }
+    .input-group { margin-bottom: 15px; }
+    .input-group label { font-size: 14px; margin-bottom: 5px; display: block; }
+    .input-group input, .input-group textarea {
+      width: 100%; padding: 8px;
+      border: 1px solid #ccc; border-radius: 5px;
+    }
+    button {
+      width: 100%; padding: 10px;
+      border: none; border-radius: 5px;
+      font-size: 14px; cursor: pointer;
+    }
+    .primary { background-color: #2563eb; color: white; margin-bottom: 10px; }
+    .link { text-align: center; font-size: 13px; margin-top: 10px; }
+    .link a { color: #2563eb; cursor: pointer; }
+    footer {
+      position: absolute;
+      bottom: 10px;
+      width: 100%;
+      text-align: center;
+      font-size: 12px;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay">
+    <div class="box" id="assistantForm">
+      <h1>Create Receptionist</h1>
+
+      <form method="POST" action="{% url 'accounts:create-assistant' %}">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <div class="input-group">
+          <label for="{{ form.username.id_for_label }}">Username</label>
+          {{ form.username }}
+        </div>
+
+        <div class="input-group">
+          <label for="{{ form.email.id_for_label }}">Email</label>
+          {{ form.email }}
+        </div>
+
+        <div class="input-group">
+          <label for="{{ form.password.id_for_label }}">Password</label>
+          {{ form.password }}
+        </div>
+
+        <button type="submit" class="primary">Create Assistant</button>
+      </form>
+
+      <div class="link"><a href="{% url 'accounts:login' %}">Back to Login</a></div>
+    </div>
+  </div>
+
+  <footer>
+    © 2025 KC Resort Billing Software. All rights reserved.
+  </footer>
+</body>
+</html>

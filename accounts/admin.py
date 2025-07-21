@@ -1,24 +1,13 @@
-from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
-from .models import CustomUser
+from django import forms
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from .models import User  # ✅ This is the missing import
 
-class CustomUserAdmin(UserAdmin):
-    model = CustomUser
-    list_display = ('email', 'name', 'is_staff', 'is_superuser')
-    search_fields = ('email', 'name')
-    ordering = ('email',)
+class CustomUserCreationForm(UserCreationForm):
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'role')
 
-    fieldsets = (
-        (None, {'fields': ('email', 'password')}),
-        ('Personal Info', {'fields': ('name',)}),
-        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
-    )
-
-    add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': ('email', 'name', 'password1', 'password2', 'is_staff', 'is_active')}
-        ),
-    )
-
-admin.site.register(CustomUser, CustomUserAdmin)
+class CustomUserChangeForm(UserChangeForm):
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'role', 'is_active', 'is_staff')
