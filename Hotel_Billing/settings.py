@@ -38,6 +38,7 @@ LOGOUT_REDIRECT_URL = 'accounts:login'
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -138,3 +139,18 @@ MEDIA_ROOT = BASE_DIR / "media"
 # Default primary key field type
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Custom settings for Django Admin
+JAZZMIN_SETTINGS = {
+    "site_title": "KC Hotel Billing",
+    "site_header": "KC Hotel Billing Admin",
+    "site_brand": "KC Hotel Billing",
+    "welcome_sign": "Welcome to My Hotel Billing Admin",
+    "copyright": "&copy; 2023 KC Hotel Billing",
+    "show_sidebar": True,
+    "navigation_expanded": True,
+    "hide_apps": [],
+    "hide_models": [],
+    "order_with_respect_to": ["auth", "myapp"],
+}

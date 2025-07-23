@@ -63,7 +63,6 @@
     <div class="box" id="loginForm">
       <center>
         <h1>KC Billing Software</h1>
-        <h3>Admin Login</h3>
       </center>
 
       <form method="POST" action="{% url 'accounts:login' %}">
@@ -86,17 +85,12 @@
 
         <div class="options">
           <label><input type="checkbox" id="rememberMe"> Remember Me</label>
-          <a href="#" onclick="alert('Forgot password flow not implemented'); return false;">Forgot Password?</a>
         </div>
 
         <button type="submit" class="primary">Login</button>
       </form>
 
-      <button class="secondary" onclick="window.location.href='{% url 'accounts:create-assistant' %}'">
-        Create Assistant Admin
-      </button>
-
-      <div class="link"><a href="#">Create New Admin (Use Django admin panel)</a></div>
+      
     </div>
   </div>
 
