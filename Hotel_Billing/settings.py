@@ -49,6 +49,11 @@ INSTALLED_APPS = [
     # Your apps
     'core',
     'accounts',
+    'booking',
+    'rooms',
+    'foods',
+    'report',
+    'transaction',
 ]
 
 MIDDLEWARE = [
