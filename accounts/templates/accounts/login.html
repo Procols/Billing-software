@@ -25,7 +25,7 @@
     .box h3 { font-size: 15px; color: gray; margin-bottom: 20px; }
     .input-group { margin-bottom: 15px; }
     .input-group label { font-size: 14px; margin-bottom: 5px; display: block; }
-    .input-group input, .input-group textarea {
+    .input-group input {
       width: 100%; padding: 8px;
       border: 1px solid #ccc; border-radius: 5px;
     }
@@ -37,7 +37,6 @@
       font-size: 14px; cursor: pointer;
     }
     .primary { background-color: #2563eb; color: white; margin-bottom: 10px; }
-    .secondary { background-color: #f3f4f6; color: #333; margin-bottom: 10px; }
     .link { text-align: center; font-size: 13px; margin-top: 10px; }
     .link a { color: #2563eb; cursor: pointer; }
     footer {
@@ -58,14 +57,7 @@
         <h3>Admin Login</h3>
       </center>
 
-      <body>
-  <div class="overlay">
-    <div class="box" id="loginForm">
-      <center>
-        <h1>KC Billing Software</h1>
-      </center>
-
-      <form method="POST" action="{% url 'accounts:login' %}">
+      <form method="POST" action="{% url 'accounts:login' %}" autocomplete="off">
         {% csrf_token %}
         {{ form.non_field_errors }}
 
@@ -89,8 +81,6 @@
 
         <button type="submit" class="primary">Login</button>
       </form>
-
-      
     </div>
   </div>
 
@@ -98,8 +88,14 @@
     © 2025 KC Resort Billing Software. All rights reserved.
   </footer>
 
-
   <script>
+    // Force reload on back navigation (to prevent CSRF mismatch)
+    window.addEventListener("pageshow", function (event) {
+      if (event.persisted || window.performance.navigation.type === 2) {
+        location.reload();
+      }
+    });
+
     // Remember Me logic
     window.onload = function () {
       const saved = localStorage.getItem("rememberedUsername");
