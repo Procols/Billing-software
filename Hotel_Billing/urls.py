@@ -24,8 +24,10 @@ from django.urls import path, include
 urlpatterns = [
     path('adminpanel/', admin.site.urls),
     path('accounts/', include('accounts.urls', namespace='accounts')),
+    path('rooms/', include('rooms.urls', namespace='rooms')),
     path('', include('core.urls', namespace='core')),
 ]
+
 
 
 if settings.DEBUG:

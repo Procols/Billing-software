@@ -1,3 +1,6 @@
 from django.contrib import admin
+from .models import Floor, RoomType, Room
 
-# Register your models here.
+admin.site.register(Floor)
+admin.site.register(RoomType)
+admin.site.register(Room)
