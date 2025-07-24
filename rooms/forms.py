@@ -4,16 +4,12 @@ from .models import RoomType, Room
 class RoomTypeForm(forms.ModelForm):
     class Meta:
         model = RoomType
-        fields = ['name', 'base_rate', 'description', 'amenities', 'floor']
+        fields = ['name', 'ac_type', 'description', 'amenities']
         labels = {
             'name': 'Enter Room Type Name',
-            'base_rate': 'Enter Base Rate',
+            'ac_type': 'Select AC Type',
             'description': 'Enter Description',
             'amenities': 'Enter Amenities',
-            'floor': 'Select Floor',
-        }
-        widgets = {
-            'floor': forms.Select()
         }
 
 class RoomForm(forms.ModelForm):
@@ -26,9 +22,4 @@ class RoomForm(forms.ModelForm):
             'floor': 'Select Floor',
             'rate_per_night': 'Enter Rate Per Night',
             'status': 'Select Status',
-        }
-        widgets = {
-            'floor': forms.Select(),
-            'room_type': forms.Select(),
-            'status': forms.Select()
         }
