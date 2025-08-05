@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Room Management - KC Resort</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
-  <style>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
     body {
       font-family: 'Inter', sans-serif;
       margin: 0;
@@ -39,13 +39,16 @@
       background-color: #cce5ff;
       color: #0056b3;
     }
+
     .main-content {
       padding: 30px;
       flex: 1;
     }
+
     h2 {
       margin-bottom: 20px;
     }
+
     .status-cards {
       display: flex;
       gap: 20px;
@@ -68,164 +71,188 @@
     .ac { color: #16a34a; }
     .non-ac { color: #2563eb; }
     .reinv { color: #dc2626; }
-    .section {
-      background: white;
-      padding: 20px;
-      margin-bottom: 20px;
-      border-radius: 8px;
-    }
-    .section h3 {
-      margin-top: 0;
-      margin-bottom: 15px;
-    }
-    .section input,
-    .section textarea,
-    .section select {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 15px;
-      border: 1px solid #d1d5db;
-      border-radius: 5px;
-    }
-    .btn {
-      padding: 10px 16px;
+
+    .addroom {
+      float: right;
+      padding: 10px 20px;
       border: none;
       border-radius: 6px;
-      cursor: pointer;
+      background-color: #16a34a;
+      color: white;
       font-weight: 600;
+      cursor: pointer;
+      margin-bottom: 50px;
+      margin-left: 10px;
     }
-    .btn-green { background-color: #22c55e; color: white; }
-    .btn-blue { background-color: #3b82f6; color: white; }
-    .btn-gray { background-color: #e5e7eb; color: #111827; }
-    .btn-outline {
-      border: 1px solid #1d4ed8;
-      color: #1d4ed8;
-      background-color: transparent;
-    }
+
     table {
       width: 100%;
       border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
     }
     th, td {
       padding: 12px;
       border-bottom: 1px solid #e5e7eb;
       text-align: left;
     }
+
     .badge {
       padding: 4px 10px;
       border-radius: 5px;
       font-size: 13px;
       font-weight: 600;
     }
-    .available { background-color: #dcfce7; color: #15803d; }
-    .occupied { background-color: #fee2e2; color: #b91c1c; }
-    .maintenance { background-color: #e5e7eb; color: #374151; }
-    .filters {
-      display: flex;
-      gap: 10px;
+
+    /* Room Type */
+    .ac { background-color: #dcfce7; color: #15803d; }
+    .non { background-color: #dbeafe; color: #1e40af; }
+
+    /* Room Status */
+    .badge.available {
+      background-color: #dcfce7; /* Light Green */
+      color: #15803d;
+    }
+
+    .badge.occupied {
+      background-color: #fee2e2; /* Light Red */
+      color: #b91c1c;
+    }
+
+    .badge.maintenance {
+      background-color: #fef3c7; /* Light Yellow */
+      color: #92400e;
+    }
+
+    .modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.4);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      width: 400px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+    .modal-content h3 {
+      margin-top: 0;
       margin-bottom: 15px;
     }
-    .filters select {
-      flex: 1;
+    .modal-content input,
+    .modal-content select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #d1d5db;
+      border-radius: 5px;
     }
+    .modal-content .btn {
+      width: 100%;
+      padding: 10px;
+      font-weight: 600;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .btn-green { background-color: #22c55e; color: white; }
+    .btn-cancel { background-color: #e5e7eb; color: #1f2937; margin-top: 10px; }
   </style>
 </head>
 <body>
-
-<div class="sidebar">
-  <ul>
-    <li><a href="{% url 'core:dashboard' %}">Dashboard</a></li>
-    <li class="active"><a href="{% url 'rooms:room_management' %}">Room Management</a></li>
-    <li><a href="">Bookings</a></li>
-    <li><a href="">Check-In/Check-Out</a></li>
-    <li><a href="">Invoicing</a></li>
-    <li><a href="">Payments</a></li>
-    <li><a href="">Reports</a></li>
-    <li><a href="">Tax Filing</a></li>
-    <li><a href="">Users List</a></li>
-    <li><a href="">Product Management</a></li>
-    <li><a href="">Settings</a></li>
-  </ul>
-</div>
-
-<div class="main-content">
-  <h2>Room Overview Dashboard</h2>
-
-  <div class="status-cards">
-    <div class="card">
-      <h4>A/C Rooms</h4>
-      <div class="count ac">{{ ac_count }}</div>
-    </div>
-    <div class="card">
-      <h4>Non-A/C Rooms</h4>
-      <div class="count non-ac">{{ non_ac_count }}</div>
-    </div>
-    <div class="card">
-      <h4>Under Maintenance</h4>
-      <div class="count reinv">{{ maintenance_count }}</div>
-    </div>
+  <div class="sidebar">
+    <ul>
+      <li><a href="#">Dashboard</a></li>
+      <li class="active"><a href="#">Room Management</a></li>
+      <li><a href="#">Bookings</a></li>
+      <li><a href="#">Check-In/Check-Out</a></li>
+      <li><a href="#">Invoicing</a></li>
+      <li><a href="#">Payments</a></li>
+      <li><a href="#">Reports</a></li>
+      <li><a href="#">Tax Filing</a></li>
+      <li><a href="#">Users List</a></li>
+      <li><a href="#">Product Management</a></li>
+      <li><a href="#">Settings</a></li>
+    </ul>
   </div>
 
-  <div class="section">
-    <h3>Add New Room Type</h3>
-    <form method="post">
-      {% csrf_token %}
-      {{ room_type_form.management_form }}
-      {% for field in room_type_form %}
-        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-        {{ field }}
-        {% if field.errors %}
-          <div style="color: red;">{{ field.errors }}</div>
-        {% endif %}
-      {% endfor %}
-      <button type="submit" name="type-submit" class="btn btn-green">Add Room Type</button>
-    </form>
-  </div>
+  <div class="main-content">
+    <h2>Room Overview Dashboard</h2>
+    <button class="addroom" onclick="showModal()">Add New Room</button>
 
-  <div class="section">
-    <h3>Add New Room</h3>
-    <form method="post">
-      {% csrf_token %}
-      {{ room_form.management_form }}
-      {% for field in room_form %}
-        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-        {{ field }}
-        {% if field.errors %}
-          <div style="color: red;">{{ field.errors }}</div>
-        {% endif %}
-      {% endfor %}
-      <button type="submit" name="room-submit" class="btn btn-green">Add Room</button>
-    </form>
-  </div>
+    <div class="status-cards">
+      <div class="card"><h4>A/C Rooms</h4><div class="count ac">{{ ac_count }}</div></div>
+      <div class="card"><h4>Non-A/C Rooms</h4><div class="count non-ac">{{ non_ac_count }}</div></div>
+      <div class="card"><h4>Under Maintenance</h4><div class="count reinv">{{ maintenance_count }}</div></div>
+    </div>
 
-  <div class="section">
-    <h3>Room List</h3>
+    <h1><center>ROOM LIST</center></h1>
     <table>
       <thead>
         <tr>
-          <th>Room No.</th>
-          <th>Type</th>
-          <th>Floor</th>
-          <th>Rate/Night</th>
+          <th>Room Number</th>
+          <th>Room Type</th>
+          <th>AC/Non-AC</th>
           <th>Status</th>
+          <th>Price</th>
+          <th>Floor</th>
         </tr>
       </thead>
       <tbody>
         {% for room in rooms %}
-          <tr>
-            <td>{{ room.room_number }}</td>
-            <td>{{ room.room_type.name }}</td>
-            <td>{{ room.floor }}</td>
-            <td>₹{{ room.rate_per_night }}</td>
-            <td><span class="badge {{ room.status }}">{{ room.get_status_display }}</span></td>
-          </tr>
+        <tr>
+          <td>{{ room.room_number }}</td>
+          <td>{{ room.room_type }}</td>
+          <td>
+            {% if room.ac_type == "AC" %}
+              <span class="badge ac">AC</span>
+            {% else %}
+              <span class="badge non">Non-AC</span>
+            {% endif %}
+          </td>
+          <td>
+            <span class="badge 
+              {% if room.status == 'Available' %}available
+              {% elif room.status == 'Occupied' %}occupied
+              {% else %}maintenance{% endif %}">
+              {{ room.status }}
+            </span>
+          </td>
+          <td>₹{{ room.price }}</td>
+          <td>{{ room.floor }}</td>
+        </tr>
         {% empty %}
-          <tr><td colspan="5">No rooms found.</td></tr>
+        <tr>
+          <td colspan="6" style="text-align:center;">No Rooms Available</td>
+        </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
-</div>
 
+  <!-- Modal -->
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <h3>Add New Room</h3>
+      <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-green">Save Room</button>
+        <button type="button" class="btn btn-cancel" onclick="hideModal()">Cancel</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function showModal() { document.getElementById('modal').style.display = 'flex'; }
+    function hideModal() { document.getElementById('modal').style.display = 'none'; }
+  </script>
 </body>
 </html>

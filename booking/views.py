@@ -1,47 +1,68 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.db.models import Sum
+from django.shortcuts import render, redirect
 from .models import Booking
-from .forms import BookingForm
+from rooms.models import Room
+from django.http import JsonResponse
 
-def bookings_overview(request):
-    bookings = Booking.objects.all().order_by('-created_at')
-    total_bookings = bookings.count()
-    pending_payments = bookings.filter(payment_status='pending').aggregate(total=Sum('room_price'))['total'] or 0
-    available_rooms = 25  # You can update this logic later based on your room availability model
+def booking_list(request):
+    bookings = Booking.objects.all()  # Get all bookings
+    rooms = Room.objects.filter(status="available")  # Only available rooms
+    return render(request, "booking/booking_list.html", {"bookings": bookings, "rooms": rooms})
 
-    context = {
-        'bookings': bookings,
-        'total_bookings': total_bookings,
-        'pending_payments': pending_payments,
-        'available_rooms': available_rooms,
-    }
-    return render(request, 'bookings/bookings.html', context)
+def new_booking(request):
+    if request.method == "POST":
+        customer_name = request.POST["customer_name"]
+        phone_number = request.POST["phone_number"]
+        address = request.POST.get("address", "")
+        document_type = request.POST["document_type"]
+        document_number = request.POST["document_number"]
+        room_id = request.POST["room"]
+        adults = request.POST["adults"]
+        children = request.POST["children"]
+        booking_status = request.POST["booking_status"]
+        checkin_date = request.POST["checkin_date"]
+        checkout_date = request.POST["checkout_date"]
+        payment_type = request.POST["payment_type"]
+        apply_gst = request.POST.get("apply_gst") == "true"
 
-def booking_create(request):
-    if request.method == 'POST':
-        form = BookingForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('booking:overview')
-    else:
-        form = BookingForm()
+        room = Room.objects.get(id=room_id)
 
-    return render(request, 'bookings/booking_form.html', {'form': form})
+        # Create booking WITHOUT invoice_number - model will set it automatically
+        booking = Booking.objects.create(
+            customer_name=customer_name,
+            phone_number=phone_number,
+            address=address,
+            document_type=document_type,
+            document_number=document_number,
+            room=room,
+            adults=adults,
+            children=children,
+            booking_status=booking_status,
+            checkin_date=checkin_date,
+            checkout_date=checkout_date,
+            payment_type=payment_type,
+            apply_gst=apply_gst,
+        )
 
-def booking_edit(request, pk):
-    booking = get_object_or_404(Booking, pk=pk)
-    if request.method == 'POST':
-        form = BookingForm(request.POST, instance=booking)
-        if form.is_valid():
-            form.save()
-            return redirect('booking:overview')
-    else:
-        form = BookingForm(instance=booking)
-    return render(request, 'bookings/booking_form.html', {'form': form})
+        # Mark room as booked
+        room.status = "booked"
+        room.save()
 
-def booking_delete(request, pk):
-    booking = get_object_or_404(Booking, pk=pk)
-    if request.method == 'POST':
-        booking.delete()
-        return redirect('booking:overview')
-    return render(request, 'bookings/booking_confirm_delete.html', {'booking': booking})
+        return redirect("booking:booking_list")
+
+    rooms = Room.objects.filter(status="available")
+    return render(request, "booking/new_booking.html", {"rooms": rooms})
+
+def get_room_details(request):
+    room_id = request.GET.get("room_id")
+    try:
+        room = Room.objects.get(id=room_id)
+        data = {
+            "room_type": room.room_type,
+            "ac_type": room.ac_type,
+            "floor": room.floor,
+            "status": room.status,
+            "price": float(room.price),
+        }
+        return JsonResponse(data)
+    except Room.DoesNotExist:
+        return JsonResponse({"error": "Room not found"}, status=404)

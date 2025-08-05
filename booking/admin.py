@@ -3,6 +3,6 @@ from .models import Booking
 
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
-    list_display = ('booking_id', 'customer_name', 'room', 'check_in_date', 'check_out_date', 'status', 'payment_status')
-    list_filter = ('status', 'payment_status', 'payment_method', 'floor')
-    search_fields = ('booking_id', 'customer_name', 'phone_number', 'room')
+    list_display = ('invoice_number', 'customer_name', 'room', 'booking_status', 'checkin_date', 'checkout_date', 'price')
+    list_filter = ('booking_status', 'payment_type', 'apply_gst')
+    search_fields = ('invoice_number', 'customer_name', 'room__room_number')

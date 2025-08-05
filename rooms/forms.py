@@ -1,25 +1,15 @@
 from django import forms
-from .models import RoomType, Room
-
-class RoomTypeForm(forms.ModelForm):
-    class Meta:
-        model = RoomType
-        fields = ['name', 'ac_type', 'description', 'amenities']
-        labels = {
-            'name': 'Enter Room Type Name',
-            'ac_type': 'Select AC Type',
-            'description': 'Enter Description',
-            'amenities': 'Enter Amenities',
-        }
+from .models import Room
 
 class RoomForm(forms.ModelForm):
     class Meta:
         model = Room
-        fields = ['room_number', 'room_type', 'floor', 'rate_per_night', 'status']
+        fields = ['room_number', 'room_type', 'ac_type', 'floor', 'price', 'status']
         labels = {
             'room_number': 'Enter Room Number',
             'room_type': 'Select Room Type',
+            'ac_type': 'Select AC Type',
             'floor': 'Select Floor',
-            'rate_per_night': 'Enter Rate Per Night',
+            'price': 'Enter Room Price',
             'status': 'Select Status',
         }

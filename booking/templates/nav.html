@@ -1,0 +1,36 @@
+<style>
+  .sidebar {
+    width: 240px;
+    background-color: #fbfcfe;
+    min-height: 100vh;
+    padding: 20px 10px;
+  }
+  .sidebar ul { list-style: none; padding: 0; }
+  .sidebar li { margin-bottom: 12px; }
+  .sidebar a {
+    color: rgb(2, 2, 2);
+    text-decoration: none;
+    padding: 10px 15px;
+    display: block;
+    border-radius: 6px;
+    transition: background 0.3s;
+  }
+  .sidebar a:hover,
+  .sidebar .active a { background-color: #b9cfff; }
+</style>
+
+<div class="sidebar">
+  <ul>
+    <li><a href="#">Dashboard</a></li>
+    <li><a href="{% url 'rooms:room_management' %}">Room Management</a></li>
+    <li class="active"><a href="{% url 'booking:booking_list' %}">Bookings</a></li>
+    <li><a href="#">Check-In/Check-Out</a></li>
+    <li><a href="#">Invoicing</a></li>
+    <li><a href="#">Payments</a></li>
+    <li><a href="#">Reports</a></li>
+    <li><a href="#">Tax Filing</a></li>
+    <li><a href="#">Users List</a></li>
+    <li><a href="#">Product Management</a></li>
+    <li><a href="#">Settings</a></li>
+  </ul>
+</div>
