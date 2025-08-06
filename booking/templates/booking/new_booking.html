@@ -33,34 +33,32 @@
 
 <form method="POST" action="{% url 'booking:new_booking' %}">
   {% csrf_token %}
+  
+  {{ form.non_field_errors }}
 
-  <label for="id_customer_name">Customer Name</label>
-  <input id="id_customer_name" name="customer_name" type="text" required>
+  <label for="{{ form.customer_name.id_for_label }}">Customer Name</label>
+  {{ form.customer_name }}
 
-  <label for="id_phone_number">Phone Number</label>
-  <input id="id_phone_number" name="phone_number" type="text" required>
+  <label for="{{ form.phone_number.id_for_label }}">Phone Number</label>
+  {{ form.phone_number }}
 
-  <label for="id_address">Address</label>
-  <input id="id_address" name="address" type="text">
+  <label for="{{ form.address.id_for_label }}">Address</label>
+  {{ form.address }}
 
-  <label for="id_document_type">Document Type</label>
-  <select id="id_document_type" name="document_type" required>
-    <option value="">Select Document</option>
-    <option value="Aadhar">Aadhar Number</option>
-    <option value="License">Driver's License</option>
-    <option value="PAN">PAN Number</option>
-  </select>
+  <label for="{{ form.document_type.id_for_label }}">Document Type</label>
+  {{ form.document_type }}
 
-  <label for="id_document_number">Document Number</label>
-  <input id="id_document_number" name="document_number" type="text" required>
+  <label for="{{ form.document_number.id_for_label }}">Document Number</label>
+  {{ form.document_number }}
 
   <label for="roomNumber">Room Number (Available Only)</label>
   <select id="roomNumber" name="room" required>
     <option value="">Select Room</option>
     {% for room in rooms %}
-      <option value="{{ room.id }}">{{ room.room_number }}</option>
+      <option value="{{ room.id }}">{{ room.room_number }} - {{ room.room_type }}</option>
     {% endfor %}
   </select>
+
 
   <div id="roomDetails">
     <strong>Room Details:</strong><br>
@@ -71,34 +69,25 @@
     Price (₹): <span id="roomPrice">0.00</span>
   </div>
 
-  <label for="id_adults">Adults</label>
-  <input id="id_adults" name="adults" type="number" min="1" value="1" required>
+  <label for="{{ form.adults.id_for_label }}">Adults</label>
+  {{ form.adults }}
 
-  <label for="id_children">Children</label>
-  <input id="id_children" name="children" type="number" min="0" value="0" required>
+  <label for="{{ form.children.id_for_label }}">Children</label>
+  {{ form.children }}
 
-  <label for="id_booking_status">Booking Status</label>
-  <select id="id_booking_status" name="booking_status" required>
-    <option value="booked">Booked</option>
-    <option value="prebooked">Pre-Booked</option>
-  </select>
+  <label for="{{ form.booking_status.id_for_label }}">Booking Status</label>
+  {{ form.booking_status }}
 
-  <label for="id_checkin_date">Check-in Date</label>
-  <input id="id_checkin_date" name="checkin_date" type="date" required>
+  <label for="{{ form.checkin_date.id_for_label }}">Check-in Date & Time</label>
+  {{ form.checkin_date }}
 
-  <label for="id_checkout_date">Check-out Date</label>
-  <input id="id_checkout_date" name="checkout_date" type="date" required>
+  <label for="{{ form.checkout_date.id_for_label }}">Check-out Date & Time </label>
+  {{ form.checkout_date }}
+
 
   <div class="radio-group">
     <label><strong>Payment Type</strong></label><br>
-    <input type="radio" id="id_payment_upi" name="payment_type" value="upi" required>
-    <label for="id_payment_upi">UPI</label>
-
-    <input type="radio" id="id_payment_cash" name="payment_type" value="cash" required>
-    <label for="id_payment_cash">Cash</label>
-
-    <input type="radio" id="id_payment_card" name="payment_type" value="card" required>
-    <label for="id_payment_card">Card</label>
+    {{ form.payment_type }}
   </div>
 
   <div class="radio-group">

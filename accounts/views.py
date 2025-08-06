@@ -12,7 +12,7 @@ def login_view(request):
 
             # 🚀 Role-based redirect
             if user.is_admin():
-                return redirect(reverse('admin:index'))  # Django admin panel
+                return redirect(reverse('core:dashboard'))  # Django admin panel
             elif user.is_receptionist():
                 return redirect('core:dashboard')  # receptionist dashboard
 

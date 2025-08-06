@@ -14,7 +14,6 @@ class Floor(models.Model):
             suffix = {1: "st", 2: "nd", 3: "rd"}.get(self.number % 10, "th")
         return f"{self.number}{suffix} Floor"
 
-
 class Room(models.Model):
     ROOM_TYPE_CHOICES = [
         ('Standard', 'Standard'),
@@ -38,7 +37,7 @@ class Room(models.Model):
     ac_type = models.CharField(max_length=10, choices=AC_CHOICES, default='Non-AC')
     floor = models.ForeignKey(Floor, on_delete=models.SET_NULL, null=True, default=get_default_floor)
     price = models.DecimalField(max_digits=8, decimal_places=2)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Available')
+    status = models.CharField(max_length=20, choices=[('available', 'Available'), ('occupied', 'Occupied')], default='available')
 
     def __str__(self):
         return f"Room {self.room_number} ({self.room_type} - {self.ac_type})"

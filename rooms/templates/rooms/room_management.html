@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -170,8 +172,9 @@
   <div class="sidebar">
     <ul>
       <li><a href="#">Dashboard</a></li>
-      <li class="active"><a href="#">Room Management</a></li>
-      <li><a href="#">Bookings</a></li>
+      <li class="active"><a href="{% url 'rooms:room_management' %}">Room Management</a></li>
+      <li ><a href="{% url 'booking:booking_list' %}">Bookings</a></li>
+      <li><a href="{% url 'foods:food_entry' %}">Food & Drinks</a></li>
       <li><a href="#">Check-In/Check-Out</a></li>
       <li><a href="#">Invoicing</a></li>
       <li><a href="#">Payments</a></li>
@@ -186,6 +189,23 @@
   <div class="main-content">
     <h2>Room Overview Dashboard</h2>
     <button class="addroom" onclick="showModal()">Add New Room</button>
+
+    <!-- Update Room Modal -->
+    <div class="modal" id="updateModal">
+      <div class="modal-content">
+        <h3>Update Room</h3>
+        <form method="POST">
+          {% csrf_token %}
+          <input type="hidden" name="update_room" value="1" />
+          <input type="hidden" name="room_id" id="updateRoomId" />
+
+          {{ update_form.as_p }}
+
+          <button type="submit" class="btn btn-green">Update Room</button>
+          <button type="button" class="btn btn-cancel" onclick="hideUpdateModal()">Cancel</button>
+        </form>
+      </div>
+    </div>
 
     <div class="status-cards">
       <div class="card"><h4>A/C Rooms</h4><div class="count ac">{{ ac_count }}</div></div>
@@ -203,6 +223,7 @@
           <th>Status</th>
           <th>Price</th>
           <th>Floor</th>
+          <th>Actions</th> <!-- Added actions column -->
         </tr>
       </thead>
       <tbody>
@@ -227,17 +248,30 @@
           </td>
           <td>₹{{ room.price }}</td>
           <td>{{ room.floor }}</td>
+          <td>
+            <button 
+              class="btn btn-green" 
+              onclick="showUpdateModal(
+                '{{ room.id }}', 
+                '{{ room.room_type }}', 
+                '{{ room.ac_type }}', 
+                '{{ room.floor.id }}', 
+                '{{ room.price }}', 
+                '{{ room.status }}'
+              )"
+              >Edit</button>
+          </td>
         </tr>
         {% empty %}
         <tr>
-          <td colspan="6" style="text-align:center;">No Rooms Available</td>
+          <td colspan="7" style="text-align:center;">No Rooms Available</td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
 
-  <!-- Modal -->
+  <!-- Add Room Modal -->
   <div class="modal" id="modal">
     <div class="modal-content">
       <h3>Add New Room</h3>
@@ -251,8 +285,44 @@
   </div>
 
   <script>
-    function showModal() { document.getElementById('modal').style.display = 'flex'; }
-    function hideModal() { document.getElementById('modal').style.display = 'none'; }
+  function showModal() {
+    document.getElementById('modal').style.display = 'flex';
+  }
+  function hideModal() {
+    document.getElementById('modal').style.display = 'none';
+  }
+
+  function showUpdateModal(id, room_type, ac_type, floor_id, price, status) {
+    document.getElementById('updateModal').style.display = 'flex';
+
+    document.getElementById('updateRoomId').value = id;
+
+    // Set room_type select
+    const roomTypeSelect = document.getElementById('id_room_type');
+    if(roomTypeSelect) roomTypeSelect.value = room_type;
+
+    // Set ac_type select
+    const acTypeSelect = document.getElementById('id_ac_type');
+    if(acTypeSelect) acTypeSelect.value = ac_type;
+
+    // Set floor select
+    const floorSelect = document.getElementById('id_floor');
+    if(floorSelect) floorSelect.value = floor_id;
+
+    // Set price input
+    const priceInput = document.getElementById('id_price');
+    if(priceInput) priceInput.value = price;
+
+    // Set status select
+    const statusSelect = document.getElementById('id_status');
+    if(statusSelect) statusSelect.value = status;
+  }
+
+  function hideUpdateModal() {
+    document.getElementById('updateModal').style.display = 'none';
+  }
   </script>
+
 </body>
 </html>
+

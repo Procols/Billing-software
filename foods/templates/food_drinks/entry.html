@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block title %}Food & Drinks - KC Resort{% endblock %}
+
+{% block content %}
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+  }
+
+  .form-box {
+    background: #fff;
+    padding: 25px;
+    max-width: 600px;
+    margin: 30px auto;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  }
+
+  label {
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
+  }
+
+  input, select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+
+  .btn-group {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+  }
+
+  .btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+  }
+
+  .btn-blue {
+    background-color: #007bff;
+    color: white;
+  }
+
+  .btn-gray {
+    background-color: #6c757d;
+    color: white;
+  }
+
+  .btn:hover {
+    opacity: 0.9;
+  }
+</style>
+
+<h1>Food & Drink Entry</h1>
+<div class="form-box">
+  <form method="POST">
+    {% csrf_token %}
+
+    <label for="id_room">Room Number</label>
+    {{ form.room }}
+
+    <label for="id_phone_number">Phone Number</label>
+    {{ form.phone_number }}
+
+    <label for="id_food_item">Food Item</label>
+    {{ form.food_item }}
+
+    <label for="id_food_price">Food Price (₹)</label>
+    {{ form.food_price }}
+
+    <label for="id_drink_item">Drink Item</label>
+    {{ form.drink_item }}
+
+    <label for="id_drink_price">Drink Price (₹)</label>
+    {{ form.drink_price }}
+
+    <div class="btn-group">
+      <button class="btn btn-blue" type="submit">Save</button>
+      <a href="#" class="btn btn-gray">Cancel</a>
+    </div>
+  </form>
+</div>
+
+{% endblock %}

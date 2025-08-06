@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'foods',
     'report',
     'transaction',
+    'checkin_checkout',
 ]
 
 MIDDLEWARE = [

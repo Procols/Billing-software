@@ -26,7 +26,9 @@ urlpatterns = [
     path('accounts/', include('accounts.urls', namespace='accounts')),
     path('rooms/', include('rooms.urls', namespace='rooms')),
     path('booking/', include('booking.urls', namespace='booking')),
-    path('', include('core.urls', namespace='core')),
+    path('foods_drinks/', include('foods.urls', namespace='foods')),
+    path('checkin-checkout/', include('checkin_checkout.urls', namespace='checkin_checkout')),
+    path('dashboard/', include('core.urls', namespace='core')),
 ]
 
 
