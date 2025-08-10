@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Food & Drinks - KC Resort{% endblock %}
+{% block content %}
+<h1 style="text-align:center">Food & Drink Entry</h1>
+<div style="max-width:700px;margin:20px auto;background:white;padding:20px;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.06);">
+  <form method="POST">
+    {% csrf_token %}
+    <label>Booking (optional)</label> {{ form.booking }}
+    <label>Room</label> {{ form.room }}
+    <label>Phone Number</label> {{ form.phone_number }}
+    <label>Food Item</label> {{ form.food_item }}
+    <label>Food Price (₹)</label> {{ form.food_price }}
+    <label>Drink Item</label> {{ form.drink_item }}
+    <label>Drink Price (₹)</label> {{ form.drink_price }}
+    <div style="margin-top:16px;">
+      <button style="background:#2563eb;color:white;padding:10px 12px;border:none;border-radius:6px;">Save</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

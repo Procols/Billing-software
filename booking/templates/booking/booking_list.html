@@ -1,87 +1,37 @@
 {% extends 'base.html' %}
 {% block title %}Booking Overview{% endblock %}
-
 {% block extra_head %}
 <style>
-  h1 { text-align: center; margin-bottom: 2rem; color: #1f2937; }
-  .filter-buttons { text-align: center; margin-bottom: 1.5rem; }
-  .filter-buttons button {
-    background: #e5e7eb; border: none; margin: 0 0.5rem;
-    padding: 10px 16px; border-radius: 6px; cursor: pointer;
-  }
-  .filter-buttons button.active { background: #2563eb; color: white; }
-  table { width: 100%; border-collapse: collapse; }
-  th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-  th { background-color: #2563eb; color: white; }
-  .floating-btn {
-    position: fixed; bottom: 30px; right: 30px;
-    background-color: #2563eb; color: white; border: none;
-    padding: 16px 20px; font-size: 16px; border-radius: 50px;
-    cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2); z-index: 1000;
-  }
+h1{text-align:center;color:#1f2937}
+.table-wrap { background:white; padding:20px; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.05); }
+table{ width:100%; border-collapse:collapse; }
+th,td{ padding:10px; border-bottom:1px solid #e5e7eb; text-align:left; }
+.btn-primary{ background:#2563eb;color:white;padding:8px 12px;border-radius:6px;text-decoration:none; }
+.floating-btn{ position:fixed; bottom:30px; right:30px; background:#2563eb; color:white; padding:16px 18px; border-radius:50px; box-shadow:0 4px 10px rgba(0,0,0,0.15); }
 </style>
 {% endblock %}
-
 {% block content %}
 <h1>Booking Overview - KC Resort</h1>
-
-<div class="filter-buttons">
-  <button onclick="filterBookings('all')" class="active">All</button>
-  <button onclick="filterBookings('booked')">Booked</button>
-  <button onclick="filterBookings('prebooked')">Pre-Booked</button>
-</div>
-
-<div class="table-container">
-  <table id="bookingTable">
-    <thead>
-      <tr>
-        <th>Invoice No</th>
-        <th>Customer</th>
-        <th>Status</th>
-        <th>Room No</th>
-        <th>Room Type</th>
-        <th>Check-in</th>
-        <th>Check-out</th>
-      </tr>
-    </thead>
+<div class="table-wrap">
+  <a href="{% url 'booking:new_booking' %}" class="btn-primary">+ New Booking</a>
+  <table style="margin-top:12px">
+    <thead><tr><th>Invoice</th><th>Customer</th><th>Status</th><th>Room</th><th>Type</th><th>Check-in</th><th>Check-out</th><th>Action</th></tr></thead>
     <tbody>
-      {% if bookings %}
-        {% for b in bookings %}
-          <tr data-status="{{ b.booking_status }}">
-            <td>{{ b.invoice_number }}</td>
-            <td>{{ b.customer_name }}</td>
-            <td>{{ b.booking_status|title }}</td>
-            <td>{{ b.room.room_number }}</td>
-            <td>{{ b.room.room_type }}</td>
-            <td>{{ b.checkin_date }}</td>
-            <td>{{ b.checkout_date }}</td>
-          </tr>
-        {% endfor %}
-      {% else %}
-        <tr><td colspan="7" style="text-align:center;">No records available</td></tr>
-      {% endif %}
+      {% for b in bookings %}
+        <tr>
+          <td>{{ b.invoice_number }}</td>
+          <td>{{ b.customer_name }}</td>
+          <td>{{ b.get_status_display }}</td>
+          <td>{{ b.room.room_number }}</td>
+          <td>{{ b.room.room_type }}</td>
+          <td>{{ b.checkin_date }}</td>
+          <td>{{ b.checkout_date|default:"-" }}</td>
+          <td><a href="{% url 'booking:booking_detail' b.pk %}">View</a></td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="8" style="text-align:center;">No records available</td></tr>
+      {% endfor %}
     </tbody>
   </table>
 </div>
-
-<button class="floating-btn" onclick="location.href='{% url 'booking:new_booking' %}'">+ New Booking</button>
-
-<script>
-  function filterBookings(status) {
-    // Remove active class from all buttons
-    document.querySelectorAll('.filter-buttons button').forEach(btn => btn.classList.remove('active'));
-    // Add active class to clicked button
-    event.target.classList.add('active');
-
-    const rows = document.querySelectorAll("#bookingTable tbody tr");
-    rows.forEach(row => {
-      if (status === 'all' || row.getAttribute('data-status') === status) {
-        row.style.display = "";
-      } else {
-        row.style.display = "none";
-      }
-    });
-  }
-</script>
-
 {% endblock %}

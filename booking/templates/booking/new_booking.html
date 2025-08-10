@@ -3,137 +3,83 @@
 
 {% block extra_head %}
 <style>
-  main {
-    margin-left: 220px;
-    padding: 2rem;
-    max-width: 700px;
-    background: white;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-    border-radius: 10px;
-    margin-top: 1rem;
-    margin-bottom: 1rem;
-  }
-  h2 { text-align: center; margin-bottom: 1.5rem; color: #1f2937; font-weight: 700; }
-  label { display: block; margin-top: 15px; font-weight: 600; color: #374151; }
-  input, select { width: 100%; padding: 10px; margin-top: 6px; border: 1px solid #d1d5db; border-radius: 6px; }
-  .radio-group { margin-top: 15px; }
-  .price-info { margin-top: 20px; font-weight: 600; font-size: 1.1rem; color: #2563eb; }
-  button { margin-top: 30px; width: 100%; padding: 12px; font-weight: 700; font-size: 1.1rem;
-           border: none; border-radius: 6px; cursor: pointer; background-color: #10b981; color: white; }
-  button:hover { background-color: #059669; }
-  #roomDetails {
-    margin-top: 20px; padding: 12px; border: 1px solid #2563eb; border-radius: 6px;
-    background: #e0f2fe; color: #1e40af; display: none;
-  }
+/* keep layout similar to your previous form */
+main { margin-left: 220px; padding: 2rem; max-width: 760px; background:white; border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.08); margin-top:1rem; margin-bottom:1rem; }
+label { display:block; margin-top:15px; font-weight:600; color:#374151; }
+input, select, textarea { width:100%; padding:10px; margin-top:6px; border:1px solid #d1d5db; border-radius:6px; }
+button { margin-top:30px; width:100%; padding:12px; font-weight:700; border:none; border-radius:6px; cursor:pointer; background-color:#10b981; color:white; }
+#roomDetails { margin-top:20px; padding:12px; border-radius:6px; background:#e0f2fe; color:#1e40af; display:none; border:1px solid #2563eb; }
 </style>
 {% endblock %}
 
 {% block content %}
-<h2>New Booking</h2>
+<h2 style="text-align:center;margin-top:0">New Booking</h2>
+<main>
+  <form method="POST" action="{% url 'booking:new_booking' %}">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
 
-<form method="POST" action="{% url 'booking:new_booking' %}">
-  {% csrf_token %}
-  
-  {{ form.non_field_errors }}
+    <label>Customer Name</label> {{ form.customer_name }}
+    <label>Phone Number</label> {{ form.phone_number }}
+    <label>Address</label> {{ form.address }}
+    <label>Document Type</label> {{ form.document_type }}
+    <label>Document Number</label> {{ form.document_number }}
 
-  <label for="{{ form.customer_name.id_for_label }}">Customer Name</label>
-  {{ form.customer_name }}
+    <label>Room Number (Available Only)</label>
+    <select id="roomNumber" name="room" required>
+      <option value="">Select Room</option>
+      {% for room in rooms %}<option value="{{ room.id }}">{{ room.room_number }} - {{ room.room_type }}</option>{% endfor %}
+    </select>
 
-  <label for="{{ form.phone_number.id_for_label }}">Phone Number</label>
-  {{ form.phone_number }}
+    <div id="roomDetails">
+      <strong>Room Details:</strong><br>
+      Type: <span id="roomType"></span><br>
+      AC Type: <span id="acType"></span><br>
+      Floor: <span id="floor"></span><br>
+      Status: <span id="roomStatus"></span><br>
+      Price (₹): <span id="roomPrice">0.00</span>
+    </div>
 
-  <label for="{{ form.address.id_for_label }}">Address</label>
-  {{ form.address }}
+    <label>Adults</label> {{ form.adults }}
+    <label>Children</label> {{ form.children }}
+    <label>Booking Status</label> {{ form.status }}
+    <label>Check-in Date</label> {{ form.checkin_date }}
+    <label>Check-out Date (optional)</label> {{ form.checkout_date }}
 
-  <label for="{{ form.document_type.id_for_label }}">Document Type</label>
-  {{ form.document_type }}
+    <label>Payment Type</label> {{ form.payment_type }}
+    <label style="margin-top:12px;">{{ form.apply_gst }} Apply GST (18%)</label>
 
-  <label for="{{ form.document_number.id_for_label }}">Document Number</label>
-  {{ form.document_number }}
-
-  <label for="roomNumber">Room Number (Available Only)</label>
-  <select id="roomNumber" name="room" required>
-    <option value="">Select Room</option>
-    {% for room in rooms %}
-      <option value="{{ room.id }}">{{ room.room_number }} - {{ room.room_type }}</option>
-    {% endfor %}
-  </select>
-
-
-  <div id="roomDetails">
-    <strong>Room Details:</strong><br>
-    Type: <span id="roomType"></span><br>
-    AC Type: <span id="acType"></span><br>
-    Floor: <span id="floor"></span><br>
-    Status: <span id="status"></span><br>
-    Price (₹): <span id="roomPrice">0.00</span>
-  </div>
-
-  <label for="{{ form.adults.id_for_label }}">Adults</label>
-  {{ form.adults }}
-
-  <label for="{{ form.children.id_for_label }}">Children</label>
-  {{ form.children }}
-
-  <label for="{{ form.booking_status.id_for_label }}">Booking Status</label>
-  {{ form.booking_status }}
-
-  <label for="{{ form.checkin_date.id_for_label }}">Check-in Date & Time</label>
-  {{ form.checkin_date }}
-
-  <label for="{{ form.checkout_date.id_for_label }}">Check-out Date & Time </label>
-  {{ form.checkout_date }}
-
-
-  <div class="radio-group">
-    <label><strong>Payment Type</strong></label><br>
-    {{ form.payment_type }}
-  </div>
-
-  <div class="radio-group">
-    <input type="checkbox" id="id_apply_gst" name="apply_gst" value="true">
-    <label for="id_apply_gst"><strong>Apply GST (18%)</strong></label>
-  </div>
-
-  <button type="submit">Save Booking</button>
-</form>
+    <button type="submit">Save Booking</button>
+  </form>
+</main>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-  function updatePrice(basePrice) {
-    const gstApplied = $("#id_apply_gst").is(":checked");
-    let finalPrice = basePrice;
-    if (gstApplied) finalPrice += basePrice * 0.18;
-    $("#roomPrice").text(finalPrice.toFixed(2));
-  }
+function updatePrice(basePrice) {
+  const gstApplied = $("#id_apply_gst").is(":checked");
+  let finalPrice = basePrice;
+  if (gstApplied) finalPrice = basePrice + (basePrice * 0.18);
+  $("#roomPrice").text(finalPrice.toFixed(2));
+  $("#roomPrice").data('basePrice', basePrice);
+}
 
-  $("#roomNumber").change(function () {
-    const roomId = $(this).val();
-    if (roomId) {
-      $.get("{% url 'booking:get_room_details' %}", { room_id: roomId })
-        .done(function (data) {
-          if (!data.error) {
-            $("#roomType").text(data.room_type);
-            $("#acType").text(data.ac_type);
-            $("#floor").text(data.floor);
-            $("#status").text(data.status);
-            updatePrice(data.price);
-            $("#roomPrice").data('basePrice', data.price);
-            $("#roomDetails").show();
-          }
-        })
-        .fail(function () {
-          alert("Failed to get room details.");
-          $("#roomDetails").hide();
-        });
-    } else {
-      $("#roomDetails").hide();
-    }
-  });
+$("#roomNumber").change(function () {
+  const roomId = $(this).val();
+  if (!roomId) { $("#roomDetails").hide(); return; }
+  $.get("{% url 'booking:get_room_details' %}", {room_id: roomId})
+    .done(function(data){
+      $("#roomType").text(data.room_type);
+      $("#acType").text(data.ac_type);
+      $("#floor").text(data.floor);
+      $("#roomStatus").text(data.status);
+      updatePrice(data.price);
+      $("#roomDetails").show();
+    }).fail(function(){ alert("Failed to fetch room details"); $("#roomDetails").hide(); });
+});
 
-  $("#id_apply_gst").change(function () {
-    let basePrice = $("#roomPrice").data('basePrice') || 0;
-    updatePrice(basePrice);
-  });
+$("#id_apply_gst").change(function(){
+  let base = $("#roomPrice").data('basePrice') || 0;
+  updatePrice(base);
+});
 </script>
 {% endblock %}

@@ -5,4 +5,5 @@ app_name = 'rooms'
 
 urlpatterns = [
     path('', views.room_management, name='room_management'),
+   
 ]

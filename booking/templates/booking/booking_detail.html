@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Booking {{ booking.invoice_number }}{% endblock %}
+{% block extra_head %}<style>.detail { background:white;padding:18px;border-radius:8px; }</style>{% endblock %}
+{% block content %}
+<h2>Booking Details - {{ booking.invoice_number }}</h2>
+<div class="detail">
+  <p><strong>Customer:</strong> {{ booking.customer_name }}</p>
+  <p><strong>Phone:</strong> {{ booking.phone_number }}</p>
+  <p><strong>Room:</strong> {{ booking.room.room_number }} - {{ booking.room.room_type }}</p>
+  <p><strong>Check-in:</strong> {{ booking.checkin_date }}</p>
+  <p><strong>Check-out:</strong> {{ booking.checkout_date|default:"Not set" }}</p>
+  <p><strong>Status:</strong> {{ booking.get_status_display }}</p>
+  <p><strong>Price (₹):</strong> {{ booking.price }}</p>
+
+  <h3>Food & Drinks Ordered</h3>
+  {% if foods %}
+    <ul>
+      {% for f in foods %}
+        <li>{{ f.created_at.date }} — {{ f.food_item|default:"-" }} (₹{{ f.food_price|default:"0.00" }}) / {{ f.drink_item|default:"-" }} (₹{{ f.drink_price|default:"0.00" }})</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No food/drinks recorded for this booking.</p>
+  {% endif %}
+
+  <form method="POST" style="margin-top:12px;">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="print">
+    <button type="submit" class="btn-primary">Print</button>
+    <a href="{% url 'booking:booking_list' %}" class="btn-secondary">Back</a>
+  </form>
+</div>
+
+<script>
+if (new URLSearchParams(window.location.search).get('print') === '1') {
+  setTimeout(()=>window.print(), 300);
+}
+</script>
+{% endblock %}

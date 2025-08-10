@@ -18,10 +18,3 @@ class RoomUpdateForm(forms.ModelForm):
     class Meta:
         model = Room
         fields = ['room_type', 'ac_type', 'floor', 'price', 'status']
-        labels = {
-            'room_type': 'Select Room Type',
-            'ac_type': 'Select AC Type',
-            'floor': 'Select Floor',
-            'price': 'Enter Room Price',
-            'status': 'Select Status',
-        }

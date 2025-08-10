@@ -1,11 +1,11 @@
 from django.db import models
+from django.utils.timezone import localdate
 from rooms.models import Room
-from django.utils.timezone import now
 
 class Booking(models.Model):
     STATUS_CHOICES = [
         ('booked', 'Booked'),
-        ('completed', 'Completed'),  # changed from 'prebooked' to 'completed' for clarity
+        ('completed', 'Completed'),
     ]
 
     PAYMENT_CHOICES = [
@@ -17,18 +17,14 @@ class Booking(models.Model):
     customer_name = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=15)
     address = models.TextField(blank=True, null=True)
-    document_type = models.CharField(
-        max_length=50,
-        choices=[('Aadhar', 'Aadhar Number'), ('License', "Driver's License"), ('PAN', 'PAN Number')],
-        default='Aadhar'
-    )
+    document_type = models.CharField(max_length=50, choices=[('Aadhar','Aadhar'), ('License','License'), ('PAN','PAN')], default='Aadhar')
     document_number = models.CharField(max_length=50)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     adults = models.PositiveIntegerField(default=1)
     children = models.PositiveIntegerField(default=0)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='booked')
-    checkin_date = models.DateTimeField(default=now)
-    checkout_date = models.DateTimeField(blank=True, null=True)
+    checkin_date = models.DateField(default=localdate)    # DATE only
+    checkout_date = models.DateField(blank=True, null=True)  # optional, DATE only
 
     payment_type = models.CharField(max_length=10, choices=PAYMENT_CHOICES, default='cash')
     apply_gst = models.BooleanField(default=False)
@@ -38,25 +34,42 @@ class Booking(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        # Auto-generate invoice number if not set
+        # invoice generation
         if not self.invoice_number:
-            last_booking = Booking.objects.order_by('-id').first()
-            if last_booking and last_booking.invoice_number and last_booking.invoice_number.startswith("INV-"):
-                last_number = int(last_booking.invoice_number.replace("INV-", ""))
-                new_number = last_number + 1
+            last = Booking.objects.order_by('-id').first()
+            if last and last.invoice_number and last.invoice_number.startswith("INV-"):
+                try:
+                    last_num = int(last.invoice_number.replace("INV-", ""))
+                    new_num = last_num + 1
+                except:
+                    new_num = 1001
             else:
-                new_number = 1001
-            self.invoice_number = f"INV-{new_number}"
+                new_num = 1001
+            self.invoice_number = f"INV-{new_num}"
 
-        # Calculate price based on room price + GST if applied
-        base_price = self.room.price
-        self.price = base_price + (base_price * 0.18) if self.apply_gst else base_price
+        # price calculation based on room price and GST
+        base = self.room.price
+        if self.apply_gst:
+            self.price = base + (base * 0.18)
+        else:
+            self.price = base
+
+        # auto-complete if checkout_date present and <= today
+        if self.checkout_date:
+            if self.checkout_date <= localdate():
+                self.status = 'completed'
 
         super().save(*args, **kwargs)
 
-        # Update room status based on booking status
+        # update room status depending on booking status
         if self.status == 'booked':
-            self.room.status = "Occupied"
+            if self.room.status != 'Occupied':
+                self.room.status = 'Occupied'
+                self.room.save()
         elif self.status == 'completed':
-            self.room.status = "Available"
-        self.room.save()
+            if self.room.status != 'Available':
+                self.room.status = 'Available'
+                self.room.save()
+
+    def __str__(self):
+        return f"{self.invoice_number} - {self.customer_name}"

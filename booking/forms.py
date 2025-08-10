@@ -1,5 +1,6 @@
 from django import forms
 from .models import Booking
+from rooms.models import Room
 
 class BookingForm(forms.ModelForm):
     class Meta:
@@ -10,13 +11,12 @@ class BookingForm(forms.ModelForm):
             'payment_type', 'apply_gst'
         ]
         widgets = {
-            'checkin_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-            'checkout_date': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'checkin_date': forms.DateInput(attrs={'type':'date'}),
+            'checkout_date': forms.DateInput(attrs={'type':'date'}),
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['checkout_date'].required = False  # make checkout optional
-
-        # Limit room choices to available rooms only
-        self.fields['room'].queryset = self.fields['room'].queryset.filter(status='Available')
+        # only available rooms for booking
+        self.fields['room'].queryset = Room.objects.filter(status='Available').order_by('room_number')
+        self.fields['checkout_date'].required = False
