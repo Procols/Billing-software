@@ -1,10 +1,11 @@
 from django.db import models
-from django.utils.timezone import localdate
+from django.utils.timezone import now
 from rooms.models import Room
 
 class Booking(models.Model):
     STATUS_CHOICES = [
         ('booked', 'Booked'),
+        ('pre_booked', 'Pre Booked'),
         ('completed', 'Completed'),
     ]
 
@@ -17,14 +18,14 @@ class Booking(models.Model):
     customer_name = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=15)
     address = models.TextField(blank=True, null=True)
-    document_type = models.CharField(max_length=50, choices=[('Aadhar','Aadhar'), ('License','License'), ('PAN','PAN')], default='Aadhar')
+    document_type = models.CharField(max_length=50, choices=[('Aadhar', 'Aadhar'), ('License', 'License'), ('PAN', 'PAN')], default='Aadhar')
     document_number = models.CharField(max_length=50)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     adults = models.PositiveIntegerField(default=1)
     children = models.PositiveIntegerField(default=0)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='booked')
-    checkin_date = models.DateField(default=localdate)    # DATE only
-    checkout_date = models.DateField(blank=True, null=True)  # optional, DATE only
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pre_booked')
+    checkin_datetime = models.DateTimeField(default=now)  # mandatory now
+    checkout_datetime = models.DateTimeField(blank=True, null=True)  # optional
 
     payment_type = models.CharField(max_length=10, choices=PAYMENT_CHOICES, default='cash')
     apply_gst = models.BooleanField(default=False)
@@ -34,35 +35,25 @@ class Booking(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
-        # invoice generation
-        if not self.invoice_number:
-            last = Booking.objects.order_by('-id').first()
-            if last and last.invoice_number and last.invoice_number.startswith("INV-"):
-                try:
-                    last_num = int(last.invoice_number.replace("INV-", ""))
-                    new_num = last_num + 1
-                except:
-                    new_num = 1001
-            else:
-                new_num = 1001
-            self.invoice_number = f"INV-{new_num}"
+        is_new = self.pk is None
 
-        # price calculation based on room price and GST
-        base = self.room.price
-        if self.apply_gst:
-            self.price = base + (base * 0.18)
-        else:
-            self.price = base
+        # Calculate price with GST if applicable before saving
+        base_price = self.room.price
+        self.price = base_price + (base_price * 0.18) if self.apply_gst else base_price
 
-        # auto-complete if checkout_date present and <= today
-        if self.checkout_date:
-            if self.checkout_date <= localdate():
-                self.status = 'completed'
+        # Auto update status to completed if checkout_datetime <= now()
+        if self.checkout_datetime and self.checkout_datetime <= now():
+            self.status = 'completed'
 
-        super().save(*args, **kwargs)
+        super().save(*args, **kwargs)  # Save first to get pk
 
-        # update room status depending on booking status
-        if self.status == 'booked':
+        # Generate invoice_number only once on creation
+        if is_new and not self.invoice_number:
+            self.invoice_number = f"INV-{100 + self.id}"
+            Booking.objects.filter(pk=self.pk).update(invoice_number=self.invoice_number)
+
+        # Update room status based on booking status
+        if self.status in ('booked', 'pre_booked'):
             if self.room.status != 'Occupied':
                 self.room.status = 'Occupied'
                 self.room.save()

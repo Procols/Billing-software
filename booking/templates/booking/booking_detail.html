@@ -7,8 +7,8 @@
   <p><strong>Customer:</strong> {{ booking.customer_name }}</p>
   <p><strong>Phone:</strong> {{ booking.phone_number }}</p>
   <p><strong>Room:</strong> {{ booking.room.room_number }} - {{ booking.room.room_type }}</p>
-  <p><strong>Check-in:</strong> {{ booking.checkin_date }}</p>
-  <p><strong>Check-out:</strong> {{ booking.checkout_date|default:"Not set" }}</p>
+  <p><strong>Check-in:</strong> {{ booking.checkin_datetime|date:"Y-m-d H:i" }}</p>
+  <p><strong>Check-out:</strong> {% if booking.checkout_datetime %}{{ booking.checkout_datetime|date:"Y-m-d H:i" }}{% else %}Not set{% endif %}</p>
   <p><strong>Status:</strong> {{ booking.get_status_display }}</p>
   <p><strong>Price (₹):</strong> {{ booking.price }}</p>
 
@@ -16,7 +16,7 @@
   {% if foods %}
     <ul>
       {% for f in foods %}
-        <li>{{ f.created_at.date }} — {{ f.food_item|default:"-" }} (₹{{ f.food_price|default:"0.00" }}) / {{ f.drink_item|default:"-" }} (₹{{ f.drink_price|default:"0.00" }})</li>
+        <li>{{ f.created_at|date:"Y-m-d" }} — {{ f.food_item|default:"-" }} (₹{{ f.food_price|default:"0.00" }}) / {{ f.drink_item|default:"-" }} (₹{{ f.drink_price|default:"0.00" }})</li>
       {% endfor %}
     </ul>
   {% else %}

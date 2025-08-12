@@ -1,7 +1,12 @@
+# foods/admin.py
 from django.contrib import admin
 from .models import FoodAndDrink
+from rooms.models import Room
 
-@admin.register(FoodAndDrink)
 class FoodAndDrinkAdmin(admin.ModelAdmin):
-    list_display = ('room', 'phone_number', 'food_item', 'food_price', 'drink_item', 'drink_price', 'created_at')
-    search_fields = ('room__room_number', 'phone_number', 'food_item', 'drink_item')
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "room":
+            kwargs["queryset"] = Room.objects.filter(status="Occupied")
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+admin.site.register(FoodAndDrink, FoodAndDrinkAdmin)

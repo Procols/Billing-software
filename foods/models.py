@@ -3,7 +3,7 @@ from rooms.models import Room
 from booking.models import Booking
 
 class FoodAndDrink(models.Model):
-    booking = models.ForeignKey(Booking, on_delete=models.CASCADE, null=True, blank=True)
+    booking = models.ForeignKey(Booking, on_delete=models.CASCADE)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
 
@@ -16,4 +16,4 @@ class FoodAndDrink(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Order for Room {self.room.room_number}"
+        return f"Order for Room {self.room.room_number} - Food: {self.food_item} Drink: {self.drink_item}"

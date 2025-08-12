@@ -1,20 +1,280 @@
-{% extends 'base.html' %}
-{% block title %}Food & Drinks - KC Resort{% endblock %}
-{% block content %}
-<h1 style="text-align:center">Food & Drink Entry</h1>
-<div style="max-width:700px;margin:20px auto;background:white;padding:20px;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.06);">
-  <form method="POST">
-    {% csrf_token %}
-    <label>Booking (optional)</label> {{ form.booking }}
-    <label>Room</label> {{ form.room }}
-    <label>Phone Number</label> {{ form.phone_number }}
-    <label>Food Item</label> {{ form.food_item }}
-    <label>Food Price (₹)</label> {{ form.food_price }}
-    <label>Drink Item</label> {{ form.drink_item }}
-    <label>Drink Price (₹)</label> {{ form.drink_price }}
-    <div style="margin-top:16px;">
-      <button style="background:#2563eb;color:white;padding:10px 12px;border:none;border-radius:6px;">Save</button>
-    </div>
-  </form>
-</div>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Food & Drinks - KC Resort</title>
+  <style>
+    /* Reset & base */
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+    body {
+      background-color: #f3f4f6;
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 220px;
+      background: #fff;
+      border-right: 1px solid hsl(220, 13%, 91%);
+      padding: 20px 10px;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+    }
+    .sidebar ul {
+      list-style: none;
+    }
+    .sidebar ul li {
+      margin-bottom: 15px;
+    }
+    .sidebar ul li a {
+      display: block;
+      color: #1f2937;
+      text-decoration: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      transition: background-color 0.3s ease;
+    }
+    .sidebar ul li.active a,
+    .sidebar ul li a:hover {
+      background-color: #c7d2fe;
+      font-weight: 600;
+    }
+
+    /* Content */
+    .content {
+      flex: 1;
+      padding: 30px;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #111827;
+    }
+
+    /* Form styles */
+    label {
+      font-weight: 600;
+      color: #374151;
+      display: block;
+      margin-bottom: 6px;
+      margin-top: 15px;
+    }
+    select, input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 15px;
+    }
+
+    .item-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .item-row input {
+      flex: 1;
+    }
+    .item-row button {
+      background-color: #ef4444;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* Buttons */
+    .btn-blue, .btn-add-more {
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      padding: 10px 20px;
+      margin-top: 20px;
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+    .btn-blue:hover, .btn-add-more:hover {
+      background-color: #1d4ed8;
+    }
+    .btn-gray {
+      background-color: #9ca3af;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      padding: 10px 20px;
+      margin-left: 10px;
+      margin-top: 20px;
+      user-select: none;
+    }
+    .btn-gray:hover {
+      background-color: #6b7280;
+    }
+
+    /* Orders List */
+    .orders-list {
+      margin-top: 40px;
+    }
+    .orders-list h2 {
+      margin-bottom: 20px;
+      color: #111827;
+      text-align: center;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    th {
+      background-color: #2563eb;
+      color: white;
+    }
+    tr:hover {
+      background-color: #f9fafb;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <ul>
+      <li><a href="DASHBOARD.html">Dashboard</a></li>
+      <li><a href="room management.html">Room Management</a></li>
+      <li><a href="Booking.html">Bookings</a></li>
+      <li class="active"><a href="#">Food & Drinks</a></li>
+      <li><a href="checkin-checkout.html">Check-In/Check-Out</a></li>
+      <li><a href="invoicing.html">Invoicing</a></li>
+      <li><a href="payments.html">Payments</a></li>
+      <li><a href="reports.html">Reports</a></li>
+      <li><a href="tax-filing.html">Tax Filing</a></li>
+      <li><a href="staff-management.html">Users List</a></li>
+      <li><a href="product management.html">Product Management</a></li>
+    </ul>
+  </nav>
+
+  <!-- Main content -->
+  <div class="content">
+    <h1>Food & Drink Entry</h1>
+
+    <form method="post" id="orderForm">
+      {% csrf_token %}
+
+      <label for="roomSelect">Room Number & Customer</label>
+      <select id="roomSelect" name="room" required>
+        <option value="">Select Room</option>
+        {% for booking in bookings %}
+          <option value="{{ booking.room.id }}">{{ booking.room.room_number }} - {{ booking.customer_name }}</option>
+        {% endfor %}
+      </select>
+
+      <label for="phoneNumber">Phone Number</label>
+      <input type="text" id="phoneNumber" name="phone_number" placeholder="Enter Phone Number" />
+
+      <div id="itemsContainer">
+        <div class="item-row">
+          <input type="text" name="food_item" placeholder="Food Item" />
+          <input type="number" name="food_price" placeholder="Food Price (₹)" step="0.01" min="0" />
+          <input type="text" name="drink_item" placeholder="Drink Item" />
+          <input type="number" name="drink_price" placeholder="Drink Price (₹)" step="0.01" min="0" />
+          <button type="button" onclick="removeItemRow(this)">Remove</button>
+        </div>
+      </div>
+
+      <button type="button" class="btn-add-more" onclick="addItemRow()">+ Add More Items</button>
+
+      <div>
+        <button type="submit" class="btn-blue">Save</button>
+        <button type="reset" class="btn-gray">Cancel</button>
+      </div>
+    </form>
+
+    <!-- Orders List -->
+    <section class="orders-list">
+      <h2>Food & Drink Orders</h2>
+      {% if food_orders %}
+      <table>
+        <thead>
+          <tr>
+            <th>Room Number</th>
+            <th>Customer Name</th>
+            <th>Phone</th>
+            <th>Food Item</th>
+            <th>Food Price (₹)</th>
+            <th>Drink Item</th>
+            <th>Drink Price (₹)</th>
+            <th>Order Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in food_orders %}
+          <tr>
+            <td>{{ order.room.room_number }}</td>
+            <td>{{ order.booking.customer_name }}</td>
+            <td>{{ order.phone_number }}</td>
+            <td>{{ order.food_item }}</td>
+            <td>{{ order.food_price }}</td>
+            <td>{{ order.drink_item }}</td>
+            <td>{{ order.drink_price }}</td>
+            <td>{{ order.created_at|date:"Y-m-d H:i" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p>No food and drink orders yet.</p>
+      {% endif %}
+    </section>
+  </div>
+
+  <script>
+    function addItemRow() {
+      const container = document.getElementById('itemsContainer');
+      const newRow = document.createElement('div');
+      newRow.classList.add('item-row');
+      newRow.innerHTML = `
+        <input type="text" name="food_item" placeholder="Food Item" />
+        <input type="number" name="food_price" placeholder="Food Price (₹)" step="0.01" min="0" />
+        <input type="text" name="drink_item" placeholder="Drink Item" />
+        <input type="number" name="drink_price" placeholder="Drink Price (₹)" step="0.01" min="0" />
+        <button type="button" onclick="removeItemRow(this)">Remove</button>
+      `;
+      container.appendChild(newRow);
+    }
+
+    function removeItemRow(button) {
+      const container = document.getElementById('itemsContainer');
+      if (container.children.length > 1) {
+        button.parentElement.remove();
+      } else {
+        alert('At least one item is required.');
+      }
+    }
+  </script>
+
+</body>
+</html>

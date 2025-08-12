@@ -4,6 +4,10 @@ from .models import Room, Floor
 from .forms import RoomForm, RoomUpdateForm
 from django.contrib.auth.decorators import login_required
 
+# For safe numeric ordering
+from django.db.models import IntegerField
+from django.db.models.functions import Cast
+
 @login_required
 def room_management(request):
     # ensure floors 1..5 exist
@@ -14,17 +18,19 @@ def room_management(request):
     non_ac_count = Room.objects.filter(ac_type='Non-AC').count()
     maintenance_count = Room.objects.filter(status='Maintenance').count()
 
-    # add
+    # ADD
     if request.method == 'POST' and request.POST.get('action') == 'add':
         form = RoomForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, "Room added.")
             return redirect('rooms:room_management')
+        else:
+            messages.error(request, "Please correct errors before saving.")
     else:
         form = RoomForm()
 
-    # update
+    # UPDATE
     if request.method == 'POST' and request.POST.get('action') == 'update':
         room_id = request.POST.get('room_id')
         room = get_object_or_404(Room, id=room_id)
@@ -33,10 +39,12 @@ def room_management(request):
             update_form.save()
             messages.success(request, "Room updated.")
             return redirect('rooms:room_management')
+        else:
+            messages.error(request, "Please correct errors before updating.")
     else:
         update_form = RoomUpdateForm()
 
-    # delete
+    # DELETE
     if request.method == 'POST' and request.POST.get('action') == 'delete':
         room_id = request.POST.get('room_id')
         room = get_object_or_404(Room, id=room_id)
@@ -44,7 +52,16 @@ def room_management(request):
         messages.success(request, "Room deleted.")
         return redirect('rooms:room_management')
 
-    rooms = Room.objects.select_related('floor').order_by('room_number')
+    # Try numeric ordering if room_number contains numeric values,
+    # otherwise fallback to string ordering.
+    try:
+        rooms = Room.objects.select_related('floor') \
+            .annotate(room_num_int=Cast('room_number', IntegerField())) \
+            .order_by('room_num_int', 'room_number')
+    except Exception:
+        # DB might not support Cast or values may be non-numeric; fallback
+        rooms = Room.objects.select_related('floor').order_by('room_number')
+
     context = {
         'ac_count': ac_count,
         'non_ac_count': non_ac_count,
