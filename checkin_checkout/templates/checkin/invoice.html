@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Invoice - KC Resort</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 30px;
+      border: 1px solid #ccc;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+    }
+    th, td {
+      border: 1px solid #333;
+      padding: 8px 12px;
+      text-align: left;
+    }
+    th {
+      background-color: #f0f0f0;
+    }
+    .total-row {
+      font-weight: bold;
+    }
+    .right-align {
+      text-align: right;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 50px;
+      font-size: 0.9em;
+      color: #555;
+    }
+    @media print {
+      .no-print {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>KC Resort Invoice</h1>
+  <p><strong>Customer:</strong> {{ booking.customer_name }}</p>
+  <p><strong>Phone:</strong> {{ booking.phone_number }}</p>
+  <p><strong>Room:</strong> {{ booking.room.room_number }} ({{ booking.room.room_type }})</p>
+  <p><strong>Check-in:</strong> {{ booking.checkin_datetime|date:"Y-m-d H:i" }}</p>
+  <p><strong>Check-out:</strong> {{ booking.checkout_datetime|date:"Y-m-d H:i" }}</p>
+  <p><strong>Total Days:</strong> {{ total_days }}</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Description</th>
+        <th class="right-align">Unit Price (₹)</th>
+        <th class="right-align">Quantity</th>
+        <th class="right-align">Amount (₹)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Room Charges</td>
+        <td class="right-align">{{ room_price }}</td>
+        <td class="right-align">{{ total_days }}</td>
+        <td class="right-align">{{ room_amount }}</td>
+      </tr>
+      {% for item in food_orders %}
+      <tr>
+        <td>{{ item.name }}</td>
+        <td class="right-align">{{ item.price }}</td>
+        <td class="right-align">{{ item.quantity|default:1 }}</td>
+        <td class="right-align">{{ item.subtotal|floatformat:2 }}</td>
+
+      </tr>
+      {% endfor %}
+      <tr class="total-row">
+        <td colspan="3" class="right-align">Total Food & Drink</td>
+        <td class="right-align">{{ food_amount }}</td>
+      </tr>
+      <tr class="total-row">
+        <td colspan="3" class="right-align">Amount Paid</td>
+        <td class="right-align">₹{{ amount_paid }}</td>
+      </tr>
+      <tr class="total-row">
+        <td colspan="3" class="right-align">Balance Due</td>
+        <td class="right-align">₹{{ balance_due }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="footer">
+    Thank you for choosing KC Resort!
+  </div>
+
+  <button class="no-print" onclick="window.print()">Print Invoice</button>
+</body>
+</html>

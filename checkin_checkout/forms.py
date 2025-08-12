@@ -1,21 +1,32 @@
 from django import forms
-from .models import CheckIn
-from rooms.models import Room
+from booking.models import Booking
 
-class CheckInForm(forms.ModelForm):
+class BookingUpdateForm(forms.ModelForm):
     class Meta:
-        model = CheckIn
-        fields = ['guest_name', 'phone', 'room', 'check_in', 'check_out', 'members']
-
+        model = Booking
+        fields = [
+            'customer_name', 'phone_number', 'address', 'document_type', 'document_number',
+            'adults', 'children', 'status', 'checkin_datetime', 'checkout_datetime',
+            'payment_type', 'apply_gst'
+        ]
         widgets = {
-            'check_in': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-            'check_out': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'checkin_datetime': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'checkout_datetime': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+        }
+
+class UpdateCheckoutForm(forms.ModelForm):
+    class Meta:
+        model = Booking
+        fields = ['checkout_datetime', 'status']
+        widgets = {
+            'checkout_datetime': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'status': forms.Select()
         }
 
     def clean(self):
         cleaned_data = super().clean()
-        check_in = cleaned_data.get('check_in')
-        check_out = cleaned_data.get('check_out')
+        checkout = cleaned_data.get('checkout_datetime')
+        checkin = self.instance.checkin_datetime
 
-        if check_out and check_in and check_out < check_in:
-            raise forms.ValidationError("Check-out date/time cannot be before check-in date/time.")
+        if checkout and checkin and checkout < checkin:
+            raise forms.ValidationError("Checkout cannot be before check-in.")

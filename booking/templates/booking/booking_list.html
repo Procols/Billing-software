@@ -15,7 +15,7 @@ th,td{ padding:10px; border-bottom:1px solid #e5e7eb; text-align:left; }
 <div class="table-wrap">
   <a href="{% url 'booking:new_booking' %}" class="btn-primary">+ New Booking</a>
   <table style="margin-top:12px">
-    <thead><tr><th>Invoice</th><th>Customer</th><th>Status</th><th>Room</th><th>Type</th><th>Check-in</th><th>Check-out</th><th>Action</th></tr></thead>
+    <thead><tr><th>Invoice</th><th>Customer</th><th>Status</th><th>Room</th><th>Type</th><th>Check-in</th><th>Check-out</th></tr></thead>
     <tbody>
       {% for b in bookings %}
         <tr>
@@ -26,7 +26,7 @@ th,td{ padding:10px; border-bottom:1px solid #e5e7eb; text-align:left; }
           <td>{{ b.room.room_type }}</td>
           <td>{{ b.checkin_datetime|date:"Y-m-d H:i" }}</td>
           <td>{% if b.checkout_datetime %}{{ b.checkout_datetime|date:"Y-m-d H:i" }}{% else %}-{% endif %}</td>
-          <td><a href="{% url 'booking:booking_detail' b.invoice_number %}">View</a></td>
+          
         </tr>
       {% empty %}
         <tr><td colspan="8" style="text-align:center;">No records available</td></tr>

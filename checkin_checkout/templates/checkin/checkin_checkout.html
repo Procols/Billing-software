@@ -6,45 +6,151 @@
 th,td{ padding:10px; border-bottom:1px solid #e5e7eb; text-align:left;}
 .badge-active{ background:#10b981;color:white;padding:6px;border-radius:6px; }
 .badge-out{ background:#f97316;color:white;padding:6px;border-radius:6px; }
+.btn-update {
+  background-color: #2563eb;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+}
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0; top: 0; width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  align-items: center; justify-content: center;
+}
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 350px;
+  max-width: 90%;
+  position: relative;
+}
+.close-btn {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 20px;
+  color: #333;
+  border: none;
+  background: none;
+}
+input[type="datetime-local"], select {
+  width: 100%;
+  padding: 6px;
+  margin: 8px 0 16px 0;
+  box-sizing: border-box;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+.save-btn {
+  background-color: #2563eb;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
 </style>
 {% endblock %}
-{% block content %}
-<h2>Check-in / Check-out Status</h2>
-<div class="table-wrap">
-  <h3>Active</h3>
-  <table style="width:100%; margin-bottom:14px;">
-    <thead><tr><th>Customer</th><th>Room</th><th>Check-in</th><th>Check-out</th><th>Status</th></tr></thead>
-    <tbody>
-      {% for b in active_bookings %}
-      <tr>
-        <td>{{ b.customer_name }}</td>
-        <td>{{ b.room.room_number }}</td>
-        <td>{{ b.checkin_date }}</td>
-        <td>{{ b.checkout_date|default:"-" }}</td>
-        <td><span class="badge-active">Active</span></td>
-      </tr>
-      {% empty %}
-      <tr><td colspan="5">No active bookings</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
 
-  <h3>Completed</h3>
-  <table style="width:100%;">
-    <thead><tr><th>Customer</th><th>Room</th><th>Check-in</th><th>Check-out</th><th>Status</th></tr></thead>
+{% block content %}
+<h2>All Bookings</h2>
+<div class="table-wrap">
+  <table style="width:100%; margin-bottom:14px;">
+    <thead>
+      <tr>
+        <th>Customer</th>
+        <th>Phone</th>
+        <th>Room No</th>
+        <th>Check-In</th>
+        <th>Check-Out</th>
+        <th>Total Members</th>
+        <th>Room Type</th>
+        <th>Floor</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
     <tbody>
-      {% for b in completed_bookings %}
+      {% for b in bookings %}
       <tr>
         <td>{{ b.customer_name }}</td>
+        <td>{{ b.phone_number }}</td>
         <td>{{ b.room.room_number }}</td>
-        <td>{{ b.checkin_date }}</td>
-        <td>{{ b.checkout_date|default:"-" }}</td>
-        <td><span class="badge-out">Checked Out</span></td>
+        <td>{% if b.checkin_datetime %}{{ b.checkin_datetime|date:"Y-m-d H:i" }}{% else %}N/A{% endif %}</td>
+        <td>{% if b.checkout_datetime %}{{ b.checkout_datetime|date:"Y-m-d H:i" }}{% else %}N/A{% endif %}</td>
+        <td>{{ b.adults|add:b.children }}</td>
+        <td>{{ b.room.room_type }}</td>
+        <td>{{ b.room.floor.number }}</td>
+        <td>
+          {% if b.status == 'booked' %}
+            <span class="badge-active">Active</span>
+          {% elif b.status == 'completed' %}
+            <span class="badge-out">Checked Out</span>
+          {% else %}
+            {{ b.status }}
+          {% endif %}
+        </td>
+        <td>
+          <button class="btn-update" onclick="openModal({{ b.id }}, '{{ b.checkout_datetime|date:'Y-m-d\TH:i' }}', '{{ b.status }}')">Update</button>
+          <a href="{% url 'checkin_checkout:view_details' b.id %}">View Details</a> |
+          <a href="{% url 'checkin_checkout:invoice' b.id %}" target="_blank">Print Invoice</a>
+        </td>
       </tr>
       {% empty %}
-      <tr><td colspan="5">No completed bookings</td></tr>
+      <tr><td colspan="10">No bookings found</td></tr>
       {% endfor %}
     </tbody>
   </table>
 </div>
+
+<!-- Modal -->
+<div id="updateModal" class="modal">
+  <div class="modal-content">
+    <button class="close-btn" onclick="closeModal()">×</button>
+    <h3>Update Checkout & Status</h3>
+    <form id="updateForm" method="post">
+      {% csrf_token %}
+      <label for="checkout_datetime">Checkout Date & Time:</label>
+      <input type="datetime-local" id="checkout_datetime" name="checkout_datetime" required>
+
+      <label for="status">Status:</label>
+      <select id="status" name="status" required>
+        <option value="booked">Active</option>
+        <option value="completed">Checked Out</option>
+      </select>
+
+      <button type="submit" class="save-btn">Save</button>
+    </form>
+  </div>
+</div>
+
+<script>
+function openModal(id, checkout, status) {
+  document.getElementById('updateModal').style.display = 'flex';
+  document.getElementById('checkout_datetime').value = checkout || '';
+  document.getElementById('status').value = status || 'booked';
+  document.getElementById('updateForm').action = '/checkin_checkout/update_checkout/' + id + '/';
+}
+
+function closeModal() {
+  document.getElementById('updateModal').style.display = 'none';
+}
+
+window.onclick = function(event) {
+  const modal = document.getElementById('updateModal');
+  if(event.target === modal) {
+    closeModal();
+  }
+}
+</script>
 {% endblock %}
