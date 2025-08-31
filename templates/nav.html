@@ -1,0 +1,58 @@
+<style>
+  .sidebar {
+    width: 240px;
+    background-color: #fbfcfe;
+    min-height: 100vh;
+    padding: 20px 10px;
+    border-right:1px solid #e6eefc;
+  }
+  .sidebar ul { list-style:none; padding:0; }
+  .sidebar li { margin-bottom:12px; }
+  .sidebar a {
+    color: rgb(2,2,2);
+    text-decoration:none;
+    padding:10px 15px;
+    display:block;
+    border-radius:6px;
+    transition:background 0.3s;
+  }
+  .sidebar a:hover, .sidebar li.active a { background-color: #b9cfff; }
+</style>
+
+<div class="sidebar">
+  <ul>
+    <li class="{% if request.resolver_match.namespace == 'core' %}active{% endif %}">
+      <a href="{% url 'core:dashboard' %}">Dashboard</a>
+    </li>
+    <li class="{% if request.resolver_match.namespace == 'rooms' %}active{% endif %}">
+      <a href="{% url 'rooms:room_management' %}">Room Management</a>
+    </li>
+    <li class="{% if request.resolver_match.namespace == 'booking' %}active{% endif %}">
+      <a href="{% url 'booking:booking_list' %}">Bookings</a>
+    </li>
+    <li class="{% if request.resolver_match.namespace == 'foods' %}active{% endif %}">
+      <a href="{% url 'foods:food_entry' %}">Food & Drinks</a>
+    </li>
+    <li class="{% if request.resolver_match.namespace == 'checkin_checkout' %}active{% endif %}">
+      <a href="{% url 'checkin_checkout:checkin_checkout' %}">Check-In/Check-Out</a>
+    </li>
+    <li class="{% if request.resolver_match.namespace == 'invoices' %}active{% endif %}">
+      <a href="{% url 'invoices:invoice_list' %}">Invoicing</a>
+    </li>
+    <li class="{% if request.resolver_match.namespace == 'transaction' %}active{% endif %}">
+      <a href="{% url 'transaction:transaction_list' %}">Payments</a>
+    </li>
+    <li class="">
+      <a href="">Tax Filing</a>
+    </li>
+    <li class="{% if request.resolver_match.namespace == 'accounts' %}active{% endif %}">
+      <a href="{% url 'accounts:user_list' %}">Users List</a>
+    </li>
+    <li class="{% if request.resolver_match.namespace == 'products' %}active{% endif %}">
+      <a href="{% url 'products:product_list' %}">Product Management</a>
+    </li>
+    <li class="{% if request.resolver_match.namespace == 'setting' %}active{% endif %}">
+      <a href="{% url 'setting:index' %}">Settings</a>
+    </li>
+  </ul>
+</div>

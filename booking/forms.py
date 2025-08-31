@@ -8,7 +8,7 @@ class BookingForm(forms.ModelForm):
         fields = [
             'customer_name', 'phone_number', 'address', 'document_type', 'document_number',
             'room', 'adults', 'children', 'status', 'checkin_datetime', 'checkout_datetime',
-            'payment_type', 'apply_gst'
+            'payment_type', 'payment_status', 'apply_gst'
         ]
         widgets = {
             'checkin_datetime': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
@@ -22,4 +22,4 @@ class BookingForm(forms.ModelForm):
         self.fields['checkout_datetime'].required = False
 
         # Show only rooms with status Available
-        self.fields['room'].queryset = Room.objects.filter(status='Available').order_by('room_number')
+        self.fields['room'].queryset = Room.objects.filter(status__iexact='Available').order_by('room_number')

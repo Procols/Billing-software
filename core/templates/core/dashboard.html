@@ -12,62 +12,87 @@
       font-family: 'Inter', sans-serif;
       background-color: #f8fafc;
       color: #1e293b;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
     }
+
+    /* Sidebar */
     .sidebar {
+      width: 240px;
+      background-color: #fbfcfe;
+      min-height: 100vh;
+      padding: 20px 10px;
+      border-right: 1px solid #e6eefc;
       position: fixed;
       top: 0;
       left: 0;
-      width: 250px;
-      height: 100vh;
-      background-color: #fff;
-      border-right: 1px solid #e5e7eb;
-      padding: 20px 0;
     }
-    .sidebar ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
+    .sidebar ul { list-style: none; padding: 0; margin: 0; }
+    .sidebar li { margin-bottom: 12px; }
+    .sidebar a {
+      color: rgb(2,2,2);
+      text-decoration: none;
+      padding: 10px 15px;
+      display: block;
+      border-radius: 6px;
+      transition: background 0.3s;
     }
-    .sidebar li {
-      padding: 12px 24px;
-      cursor: pointer;
-      font-weight: 500;
-    }
-    .sidebar li:hover, .sidebar li.active {
-      background-color: #e0f2fe;
-      color: #0284c7;
-    }
+    .sidebar a:hover, .sidebar a.active { background-color: #b9cfff; }
+
+    /* Main content */
     .main {
-      margin-left: 260px;
+      flex: 1;
+      margin-left: 240px;
       padding: 20px 40px;
     }
-    .header {
+
+    /* Header */
+    .main-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-direction: column;
       margin-bottom: 20px;
     }
-    .header h2 {
+
+    .kc-name {
+      font-weight: 700;
       font-size: 24px;
+      color: #000; /* black */
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .header-row {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .dashboard-title {
+      font-size: 22px;
       font-weight: 600;
+      color: #1e293b;
     }
-    .header .actions button {
-      margin-left: 10px;
-      padding: 8px 16px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 500;
-    }
-    .primary {
-      background-color: #2563eb;
+
+    .logout-btn {
+      background-color: #f02849;
       color: #fff;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s;
+      text-decoration: none;
     }
-    .outline {
-      border: 1px solid #2563eb;
-      color: #2563eb;
-      background-color: #fff;
+    .logout-btn:hover {
+      background-color: #c21c3a;
     }
+
+    /* Cards */
     .cards {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -80,157 +105,112 @@
       border-radius: 10px;
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     }
-    .card h3 {
-      font-size: 16px;
-      color: #64748b;
-    }
-    .card p {
-      font-size: 20px;
-      font-weight: 600;
-      margin-top: 6px;
-    }
-    .section {
-      display: flex;
-      gap: 20px;
-    }
-    .chart, .bar {
-      flex: 1;
-      background: #fff;
-      border-radius: 10px;
-      padding: 20px;
-      height: 320px;
-    }
-    .table {
+    .card h3 { font-size: 16px; color: #64748b; }
+    .card p { font-size: 20px; font-weight: 600; margin-top: 6px; }
+
+    /* Table / Invoices */
+    .table-container {
       margin-top: 40px;
       background: #fff;
       padding: 20px;
       border-radius: 10px;
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    table th, table td {
-      padding: 12px;
-      text-align: left;
-      border-bottom: 1px solid #e5e7eb;
-    }
-    .status {
-      padding: 4px 10px;
-      border-radius: 5px;
-      font-size: 12px;
-      font-weight: 500;
-    }
-    .paid { background-color: #dcfce7; color: #15803d; }
-    .pending { background-color: #fef9c3; color: #92400e; }
-    .overdue { background-color: #fee2e2; color: #b91c1c; }
+    table { width: 100%; border-collapse: collapse; }
+    table th, table td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+    .badge-paid { background-color: #d4edda; color: #155724; padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+    .badge-pending { background-color: #fef3c7; color: #92400e; padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+    .btn-print { background: none; border: 1px solid #0284c7; color: #0284c7; border-radius: 6px; padding: 4px 8px; text-decoration: none; font-size: 12px; }
+    .btn-print:hover { background: #0284c7; color: #fff; }
   </style>
 </head>
 <body>
+
+  <!-- Sidebar -->
   <div class="sidebar">
-    <ul>
-      <li class="active">Dashboard</li>
-      <a href="{% url 'rooms:room_management' %}"><li>Room Management</li></a>
-      <li>Bookings</li>
-      <li>Check-In/Check-Out</li>
-      <li>Invoicing</li>
-      <li>Payments</li>
-      <li>Reports</li>
-      <li>Tax Filing</li>
-      <li>Staff Management</li>
-      <li>Settings</li>
-    </ul>
+  <ul>
+    <li><a href="{% url 'core:dashboard' %}">Dashboard</a></li>
+    <li><a href="{% url 'rooms:room_management' %}">Room Management</a></li>
+    <lii class="active"><a href="{% url 'booking:booking_list' %}">Bookings</a></lii>
+    <li><a href="{% url 'foods:food_entry' %}">Food & Drinks</a></li>
+    <l><a href="{% url 'checkin_checkout:checkin_checkout' %}">Check-In/Check-Out</a></l>
+    <li><a href="{% url 'invoices:invoice_list' %}">Invoicing</a></li>
+    <li><a href="{% url 'transaction:payment_list' %}">Payments</a></li>
+    <li><a href="{% url 'tax_filling:tax_filling' %}">Tax Filing</a></li>
+    <li><a href="{% url 'accounts:create-receptionist' %}">Users List</a></li>
+    <li><a href="{% url 'products:product_list' %}">Product Management</a></li>
+    <!-- base.html or sidebar.html -->
+    {% if request.user.is_admin or request.user.is_subadmin %}
+        <li><a href="{% url 'reports:dashboard' %}">Reports</a></li>
+        <li><a href="{% url 'settings:dashboard' %}">Settings</a></li>
+    {% endif %}
+
+  </ul>
   </div>
+
+  <!-- Main content -->
   <div class="main">
-    <div class="header">
-      <div style="display: flex; align-items: center; gap: 15px;">
-        <img src="" alt="KC Resort Logo" style="height: 50px;">
-        <h2>K C Resort - Dashboard Overview</h2>
+    <div class="main-header">
+      <span class="kc-name">K C Resort</span>
+      <div class="header-row">
+        <span class="dashboard-title">Dashboard</span>
+        <a href="{% url 'accounts:logout' %}" class="logout-btn">Logout</a>
       </div>
-      <div class="actions">
-        <button class="primary">New Booking</button>
-        <button class="outline">Generate Report</button>
-      </div>
-    </div>
-    <div class="cards">
-      <div class="card"><h3>Total Customers</h3><p>50</p></div>
-      <div class="card"><h3>Rooms Available</h3><p>2 / 15</p></div>
-      <div class="card"><h3>Bookings Today</h3><p>13</p></div>
-      <div class="card"><h3>Revenue Today</h3><p>₹12,500</p></div>
-      <div class="card"><h3>Pending Payments</h3><p>₹8,200</p></div>
-      <div class="card"><h3>Occupancy Rate</h3><p>80%</p></div>
-      <div class="card"><h3>Check-ins Today</h3><p>25</p></div>
     </div>
 
-    <div class="table">
+    <!-- Cards -->
+    <div class="cards">
+      <div class="card"><h3>Total Rooms</h3><p>{{ total_rooms }}</p></div>
+      <div class="card"><h3>Rooms Available</h3><p>{{ available_rooms }} / {{ total_rooms }}</p></div>
+      <div class="card"><h3>Bookings Today</h3><p>{{ todays_bookings }}</p></div>
+      <div class="card"><h3>Occupancy Rate</h3><p>{{ occupancy_rate }}%</p></div>
+      <div class="card"><h3>Check-ins Today</h3><p>{{ todays_checkins }}</p></div>
+      <div class="card"><h3>Today's Revenue</h3><p>₹{{ todays_revenue }}</p></div>
+    </div>
+
+    <!-- Recent Invoices -->
+    <div class="table-container">
       <h3>Recent Invoices</h3>
       <table>
         <thead>
           <tr>
-            <th>Invoice ID</th>
+            <th>Invoice Number</th>
             <th>Guest Name</th>
             <th>Room No.</th>
-            <th>Check-out Date</th>
-            <th>Total</th>
+            <th>Check-in</th>
+            <th>Check-out</th>
+            <th>Total Amount</th>
             <th>Status</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr><td>INV001</td><td>Alice Smith</td><td>302</td><td>2024-07-15</td><td>₹1,250.00</td><td><span class="status paid">Paid</span></td><td>View Details</td></tr>
-          <tr><td>INV002</td><td>Bob Johnson</td><td>510</td><td>2024-07-16</td><td>₹280.00</td><td><span class="status pending">Pending</span></td><td>View Details</td></tr>
-          <tr><td>INV003</td><td>Charlie Brown</td><td>201</td><td>2024-07-13</td><td>₹800.00</td><td><span class="status paid">Paid</span></td><td>View Details</td></tr>
-          <tr><td>INV004</td><td>Diana Prince</td><td>405</td><td>2024-07-12</td><td>₹1,050.00</td><td><span class="status overdue">Overdue</span></td><td>View Details</td></tr>
-          <tr><td>INV005</td><td>Eva Adams</td><td>108</td><td>2024-07-13</td><td>₹720.00</td><td><span class="status paid">Paid</span></td><td>View Details</td></tr>
-          <tr><td>INV006</td><td>Frank Green</td><td>203</td><td>2024-07-13</td><td>₹300.00</td><td><span class="status pending">Pending</span></td><td>View Details</td></tr>
-          <tr><td>INV007</td><td>Grace Hall</td><td>305</td><td>2024-07-12</td><td>₹900.00</td><td><span class="status paid">Paid</span></td><td>View Details</td></tr>
-          <tr><td>INV008</td><td>Henry King</td><td>207</td><td>2024-07-08</td><td>₹1,000.00</td><td><span class="status paid">Paid</span></td><td>View Details</td></tr>
+          {% for b in bookings %}
+          <tr>
+            <td>{{ b.invoice_number }}</td>
+            <td>{{ b.customer_name }}</td>
+            <td>{{ b.room.room_number }}</td>
+            <td>{{ b.checkin_datetime|date:"Y-m-d" }}</td>
+            <td>{% if b.checkout_datetime %}{{ b.checkout_datetime|date:"Y-m-d" }}{% else %}-{% endif %}</td>
+            <td>₹{{ b.price }}</td>
+            <td>
+              {% if b.payment_status == 'paid' %}
+                <span class="badge-paid">Paid</span>
+              {% else %}
+                <span class="badge-pending">Pending</span>
+              {% endif %}
+            </td>
+            <td>
+              <a href="{% url 'core:invoice_detail' b.id %}" class="btn-print" target="_blank">🖨️ Print</a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="8" class="text-center">No records available</td></tr>
+          {% endfor %}
         </tbody>
       </table>
     </div>
+
   </div>
 
-  <script>
-    const ctx1 = document.getElementById('revenueChart').getContext('2d');
-    new Chart(ctx1, {
-      type: 'line',
-      data: {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
-        datasets: [{
-          label: 'Revenue',
-          data: [30000, 35000, 32000, 40000, 45000],
-          borderColor: '#3b82f6',
-          backgroundColor: 'rgba(59, 130, 246, 0.1)',
-          fill: true,
-          tension: 0.4
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { display: false }
-        }
-      }
-    });
-
-    const ctx2 = document.getElementById('roomChart').getContext('2d');
-    new Chart(ctx2, {
-      type: 'bar',
-      data: {
-        labels: ['Standard', 'Deluxe', 'Suite', 'Family'],
-        datasets: [{
-          label: 'Rooms',
-          data: [70, 55, 45, 60],
-          backgroundColor: ['#3b82f6', '#60a5fa', '#93c5fd', '#1d4ed8']
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { display: false }
-        }
-      }
-    });
-  </script>
 </body>
 </html>

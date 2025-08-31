@@ -56,6 +56,10 @@ INSTALLED_APPS = [
     'report',
     'transaction',
     'checkin_checkout',
+    'invoices',
+    'products',
+    'setting',
+    'tax_filling',
 ]
 
 MIDDLEWARE = [

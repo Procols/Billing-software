@@ -1,10 +1,9 @@
 from django.urls import path
-from django.shortcuts import redirect
-from .views import dashboard_view
+from . import views
 
-app_name = 'core'
+app_name = "core"
 
 urlpatterns = [
-    path('', lambda request: redirect('accounts:login') if not request.user.is_authenticated else redirect('core:dashboard'), name='home'),
-    path('dashboard/', dashboard_view, name='dashboard'),
+    path("dashboard/", views.dashboard, name="dashboard"),  # Dashboard with invoices included
+    path("invoice/<int:booking_id>/", views.invoice_detail, name="invoice_detail"),  # Invoice detail
 ]

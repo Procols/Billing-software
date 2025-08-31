@@ -1,0 +1,246 @@
+
+{% block content %}
+<div class="main-wrapper">
+
+  <!-- Sidebar included from nav.html -->
+
+
+  <!-- Content Area -->
+  <div class="content">
+    <div class="container">
+      
+      <!-- Header -->
+      <div class="header d-flex justify-content-between align-items-start mb-4">
+        <div><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Heart_corazón.svg/768px-Heart_corazón.svg.png" alt="KC Resort Logo"></div>
+        <div class="info text-end">
+          <strong>HOTEL KC STAYS</strong><br>
+          <strong>Invoice #{{ booking.invoice_number }}</strong><br>
+          <strong>GSTIN : 33ABXPC4428J1ZG</strong><br>
+          Date: {{ booking.created_at|date:"F d, Y" }}
+        </div>
+      </div>
+      <hr>
+
+      <!-- Customer Info -->
+      <div class="section mb-4">
+        <h3>Billed To:</h3>
+        <div class="box">
+          <strong>Customer Name:</strong> {{ booking.customer_name }}<br>
+          <strong>Address:</strong> {{ booking.address|linebreaksbr }}<br>
+          <strong>Phone:</strong> {{ booking.phone_number }}<br>
+          <strong>ID Proof:</strong> {{ booking.document_type }} - {{ booking.document_number }}
+        </div>
+      </div>
+
+      <!-- Booking Details -->
+      <div class="section mb-4">
+        <h3>Booking Details:</h3>
+        <div class="box">
+          <strong>Room Number:</strong> {{ booking.room.room_number }}<br>
+          <strong>Room Type:</strong> {{ booking.room.room_type }}<br>
+          <strong>Check-in:</strong> {{ booking.checkin_datetime|date:"F d, Y, H:i A" }}<br>
+          <strong>Check-out:</strong> {% if booking.checkout_datetime %}{{ booking.checkout_datetime|date:"F d, Y, H:i A" }}{% else %}-{% endif %}<br>
+          <strong>Total Days Stayed:</strong> {{ total_days }} Day{% if total_days != 1 %}s{% endif %}<br>
+          <strong>Adults:</strong> {{ booking.adults }}<br>
+          <strong>Children:</strong> {{ booking.children }}
+        </div>
+      </div>
+
+      <!-- Payment Mode -->
+      <div class="section mb-4">
+        <h3>Payment :</h3>
+        <div class="box" style="max-width: 200px;">
+          <strong>Payment Type:</strong> {{ booking.payment_type|upper }}
+        </div>
+      </div>
+
+      <!-- Billing Breakdown & Totals -->
+      <div class="section mb-4">
+        <h3>Billing Breakdown:</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th>Description</th>
+              <th>Qty</th>
+              <th>Rate (₹)</th>
+              <th>Amount (₹)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{ booking.customer_name }}</td>
+              <td>Room Rent ({{ total_days }} night{% if total_days != 1 %}s{% endif %})</td>
+              <td>{{ total_days }}</td>
+              <td>{{ room_price|floatformat:2 }}</td>
+              <td>{{ room_amount|floatformat:2 }}</td>
+            </tr>
+            {% for item in food_orders %}
+            <tr>
+              <td>{{ booking.customer_name }}</td>
+              <td>{{ item.food_item }}{% if item.drink_item %} + {{ item.drink_item }}{% endif %}</td>
+              <td>{{ item.quantity }}</td>
+              <td>{{ item.food_price|floatformat:2 }}</td>
+              <td>{{ item.subtotal|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="totals mb-4">
+        Room Amount: ₹{{ room_amount|floatformat:2 }}<br>
+        {% if booking.apply_gst %}
+          CGST ({{ cgst_rate }}%): ₹{{ cgst_amount|floatformat:2 }}<br>
+          SGST ({{ sgst_rate }}%): ₹{{ sgst_amount|floatformat:2 }}<br>
+        {% endif %}
+        
+        <strong>Grand Total: ₹{{ grand_total|floatformat:2 }}</strong><br>
+        <strong>Balance Due: ₹{{ balance_due|floatformat:2 }}</strong>
+      </div>
+
+      <div class="buttons mb-4">
+        <button onclick="window.print()">🖨️ Print Invoice</button>
+      </div>
+
+      <!-- Terms -->
+      <div class="terms mb-4">
+        <strong>Terms & Conditions</strong><br>
+        All payments are due upon receipt of invoice unless otherwise specified.<br>
+        Any disputes regarding billing must be reported within 7 days of invoice date.<br>
+        Bills may be charged with applicable taxes and service tax at 12.5% per month.<br>
+        This invoice serves as a record of services provided and legally binding.<br>
+        Thank you for choosing KC Resort for your stay!
+      </div>
+
+      <!-- Signature -->
+      <div class="signature">
+        For KC Resort<br><br>
+        ___________________________<br>
+        Authorized Signature
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<style>
+body {
+  font-family: 'Inter', sans-serif;
+  background: #f8f9fa;
+  margin: 0;
+}
+
+.container {
+  max-width: 800px;
+  margin: 30px auto;
+  background: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 30px;
+}
+
+.header img {
+  width: 60px;
+}
+
+.header .info {
+  text-align: right;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.section h3 {
+  margin-bottom: 10px;
+  color: #333;
+  font-weight: 600;
+  font-size: 16px;
+  border-bottom: 2px solid #343a40;
+  padding-bottom: 5px;
+}
+
+.box {
+  background: #f1f1f1;
+  padding: 15px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 12px;
+}
+
+th {
+  background: #343a40;
+  color: #fff;
+  font-weight: 600;
+}
+
+td:nth-child(n+3),
+th:nth-child(n+3) {
+  text-align: right;
+}
+
+.totals {
+  text-align: right;
+  font-weight: bold;
+  font-size: 16px;
+  color: #222;
+}
+
+.buttons button {
+  padding: 8px 16px;
+  margin-right: 10px;
+  border: none;
+  background: #343a40;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.terms {
+  font-size: 12px;
+  color: #555;
+  background: #f1f1f1;
+  padding: 15px;
+  border-radius: 8px;
+  text-align: justify;
+}
+
+.signature {
+  margin-top: 40px;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.signature .name {
+  margin-top: 30px;
+}
+
+@media print {
+  body * { visibility: hidden; }
+  .container, .container * { visibility: visible; }
+  .container { position: absolute; left: 0; top: 0; width: 100%; }
+  button { display: none; }
+}
+</style>
+{% endblock %}

@@ -1,7 +1,10 @@
 from django.contrib.auth import login, logout
 from django.shortcuts import render, redirect
-from .forms import LoginForm, AssistantCreateForm
+from .forms import LoginForm, ReceptionistCreateForm  # Corrected import
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
+from .decorators import admins_only
+
 
 def login_view(request):
     if request.method == 'POST':
@@ -10,29 +13,31 @@ def login_view(request):
             user = form.get_user()
             login(request, user)  # Log the user in
 
-            # 🚀 Role-based redirect
-            if user.is_admin():
-                return redirect(reverse('core:dashboard'))  # Django admin panel
-            elif user.is_receptionist():
-                return redirect('core:dashboard')  # receptionist dashboard
-
+            # 🚀 Redirect all users to dashboard
+            return redirect(reverse('core:dashboard'))
     else:
         form = LoginForm()
 
     return render(request, 'accounts/login.html', {'form': form})
 
 
+@login_required
 def logout_view(request):
     logout(request)
     return redirect('accounts:login')
 
 
-def create_assistant_view(request):
+@admins_only
+def create_receptionist_view(request):
+    """
+    Only Admin/Sub Admin can create Receptionist
+    """
     if request.method == 'POST':
-        form = AssistantCreateForm(request.POST)
+        form = ReceptionistCreateForm(request.POST)
         if form.is_valid():
             form.save()
             return redirect('accounts:login')
     else:
-        form = AssistantCreateForm()
-    return render(request, 'accounts/create_assistant.html', {'form': form})
+        form = ReceptionistCreateForm()
+    
+    return render(request, 'accounts/create_receptionist.html', {'form': form})

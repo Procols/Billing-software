@@ -161,21 +161,48 @@
 <body>
 
   <!-- Sidebar -->
-  <nav class="sidebar">
-    <ul>
-      <li><a href="DASHBOARD.html">Dashboard</a></li>
-      <li><a href="room management.html">Room Management</a></li>
-      <li><a href="Booking.html">Bookings</a></li>
-      <li class="active"><a href="#">Food & Drinks</a></li>
-      <li><a href="checkin-checkout.html">Check-In/Check-Out</a></li>
-      <li><a href="invoicing.html">Invoicing</a></li>
-      <li><a href="payments.html">Payments</a></li>
-      <li><a href="reports.html">Reports</a></li>
-      <li><a href="tax-filing.html">Tax Filing</a></li>
-      <li><a href="staff-management.html">Users List</a></li>
-      <li><a href="product management.html">Product Management</a></li>
-    </ul>
-  </nav>
+<style>
+  .sidebar {
+    width: 240px;
+    background-color: #fbfcfe;
+    min-height: 100vh;
+    padding: 20px 10px;
+    border-right: 1px solid #e6eefc;
+  }
+  .sidebar ul { list-style: none; padding: 0; }
+  .sidebar li { margin-bottom: 12px; }
+  .sidebar a {
+    color: rgb(2,2,2);
+    text-decoration: none;
+    padding: 10px 15px;
+    display: block;
+    border-radius: 6px;
+    transition: background 0.3s;
+  }
+  .sidebar a:hover, .sidebar .active a { background-color: #b9cfff; }
+</style>
+
+<div class="sidebar">
+  <ul>
+    <li><a href="{% url 'core:dashboard' %}">Dashboard</a></li>
+    <li><a href="{% url 'rooms:room_management' %}">Room Management</a></li>
+    <lii class="active"><a href="{% url 'booking:booking_list' %}">Bookings</a></lii>
+    <li><a href="{% url 'foods:food_entry' %}">Food & Drinks</a></li>
+    <l><a href="{% url 'checkin_checkout:checkin_checkout' %}">Check-In/Check-Out</a></l>
+    <li><a href="{% url 'invoices:invoice_list' %}">Invoicing</a></li>
+    <li><a href="{% url 'transaction:payment_list' %}">Payments</a></li>
+    <li><a href="{% url 'tax_filling:tax_filling' %}">Tax Filing</a></li>
+    <li><a href="{% url 'accounts:create-receptionist' %}">Users List</a></li>
+    <li><a href="{% url 'products:product_list' %}">Product Management</a></li>
+    <!-- base.html or sidebar.html -->
+    {% if request.user.is_admin or request.user.is_subadmin %}
+        <li><a href="{% url 'reports:dashboard' %}">Reports</a></li>
+        <li><a href="{% url 'settings:dashboard' %}">Settings</a></li>
+    {% endif %}
+
+  </ul>
+</div>
+
 
   <!-- Main content -->
   <div class="content">

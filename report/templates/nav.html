@@ -1,0 +1,20 @@
+<div class="sidebar">
+  <ul>
+    <li><a href="{% url 'core:dashboard' %}">Dashboard</a></li>
+    <li><a href="{% url 'rooms:room_management' %}">Room Management</a></li>
+    <lii class="active"><a href="{% url 'booking:booking_list' %}">Bookings</a></lii>
+    <li><a href="{% url 'foods:food_entry' %}">Food & Drinks</a></li>
+    <l><a href="{% url 'checkin_checkout:checkin_checkout' %}">Check-In/Check-Out</a></l>
+    <li><a href="{% url 'invoices:invoice_list' %}">Invoicing</a></li>
+    <li><a href="{% url 'transaction:payment_list' %}">Payments</a></li>
+    <li><a href="{% url 'tax_filling:tax_filling' %}">Tax Filing</a></li>
+    <li><a href="{% url 'accounts:create-receptionist' %}">Users List</a></li>
+    <li><a href="{% url 'products:product_list' %}">Product Management</a></li>
+    <!-- base.html or sidebar.html -->
+    {% if request.user.is_admin or request.user.is_subadmin %}
+        <li><a href="{% url 'reports:dashboard' %}">Reports</a></li>
+        <li><a href="{% url 'settings:dashboard' %}">Settings</a></li>
+    {% endif %}
+
+  </ul>
+</div>

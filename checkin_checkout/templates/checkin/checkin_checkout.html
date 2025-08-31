@@ -2,155 +2,174 @@
 {% block title %}Check-In / Check-Out{% endblock %}
 {% block extra_head %}
 <style>
-.table-wrap{ background:white;padding:16px;border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.06); }
-th,td{ padding:10px; border-bottom:1px solid #e5e7eb; text-align:left;}
-.badge-active{ background:#10b981;color:white;padding:6px;border-radius:6px; }
-.badge-out{ background:#f97316;color:white;padding:6px;border-radius:6px; }
-.btn-update {
-  background-color: #2563eb;
-  color: white;
-  padding: 4px 8px;
-  border-radius: 5px;
-  font-size: 0.9rem;
-  text-decoration: none;
-  cursor: pointer;
-  border: none;
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f3f4f6;
+    margin: 0;
 }
+.main-content { padding: 30px; }
+.page-title {
+    font-size: 30px; font-weight: 700; margin-bottom: 25px;
+    color: #111827; text-align: center;
+}
+.search-bar {
+    display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;
+    margin-bottom: 20px;
+}
+.search-bar input, .search-bar button {
+    padding: 10px 14px; border-radius: 8px; border: 1px solid #d1d5db;
+    font-size: 14px;
+}
+.search-bar button {
+    background-color: #2563eb; color: white; font-weight: 600;
+    border: none; cursor: pointer; transition: 0.2s;
+}
+.search-bar button:hover { background-color: #1e40af; transform: scale(1.02); }
+.table-wrap { overflow-x: auto; }
+table {
+    width: 100%; border-collapse: collapse; background: white;
+    border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+thead th {
+    background-color: #f9fafb; font-weight: 600; padding: 14px;
+    text-align: left; color: #374151;
+}
+tbody td {
+    padding: 14px; border-bottom: 1px solid #e5e7eb;
+    vertical-align: middle; font-size: 14px; color: #374151;
+}
+tbody tr:hover { background-color: #f1f5f9; }
+.badge-active, .badge-out {
+    padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: 600;
+}
+.badge-active { background: #10b981; color: white; }
+.badge-out { background: #f97316; color: white; }
+.btn-view, .btn-update {
+    padding: 6px 12px; border-radius: 8px; font-weight: 600;
+    border: none; color: white; cursor: pointer; transition: all 0.15s;
+    font-size: 0.85rem;
+}
+.btn-view { background-color: #6b7280; }
+.btn-view:hover { background-color: #4b5563; }
+.btn-update { background-color: #2563eb; }
+.btn-update:hover { background-color: #1e40af; }
 .modal {
-  display: none;
-  position: fixed;
-  z-index: 9999;
-  left: 0; top: 0; width: 100%; height: 100%;
-  background-color: rgba(0,0,0,0.5);
-  align-items: center; justify-content: center;
+    display: none; position: fixed; z-index: 9999; top: 0; left: 0;
+    width: 100%; height: 100%; background-color: rgba(0,0,0,0.4);
+    justify-content: center; align-items: center;
 }
 .modal-content {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  width: 350px;
-  max-width: 90%;
-  position: relative;
+    background: white; padding: 22px; border-radius: 12px; width: 400px;
+    max-width: 90%; box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    position: relative;
+}
+.modal-content input, .modal-content select {
+    width: 100%; padding: 10px; margin-bottom: 12px;
+    border-radius: 6px; border: 1px solid #d1d5db; font-size: 14px;
 }
 .close-btn {
-  position: absolute;
-  right: 10px;
-  top: 10px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 20px;
-  color: #333;
-  border: none;
-  background: none;
-}
-input[type="datetime-local"], select {
-  width: 100%;
-  padding: 6px;
-  margin: 8px 0 16px 0;
-  box-sizing: border-box;
-  border-radius: 4px;
-  border: 1px solid #ccc;
+    position: absolute; top: 12px; right: 12px; font-size: 22px;
+    font-weight: bold; background: none; border: none; cursor: pointer;
 }
 .save-btn {
-  background-color: #2563eb;
-  color: white;
-  padding: 8px 15px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+    background-color: #2563eb; color: white; padding: 10px 20px;
+    border-radius: 8px; border: none; cursor: pointer; font-weight: 600;
+    transition: 0.2s;
 }
+.save-btn:hover { transform: scale(1.02); }
 </style>
 {% endblock %}
 
 {% block content %}
-<h2>All Bookings</h2>
-<div class="table-wrap">
-  <table style="width:100%; margin-bottom:14px;">
-    <thead>
-      <tr>
-        <th>Customer</th>
-        <th>Phone</th>
-        <th>Room No</th>
-        <th>Check-In</th>
-        <th>Check-Out</th>
-        <th>Total Members</th>
-        <th>Room Type</th>
-        <th>Floor</th>
-        <th>Status</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for b in bookings %}
-      <tr>
-        <td>{{ b.customer_name }}</td>
-        <td>{{ b.phone_number }}</td>
-        <td>{{ b.room.room_number }}</td>
-        <td>{% if b.checkin_datetime %}{{ b.checkin_datetime|date:"Y-m-d H:i" }}{% else %}N/A{% endif %}</td>
-        <td>{% if b.checkout_datetime %}{{ b.checkout_datetime|date:"Y-m-d H:i" }}{% else %}N/A{% endif %}</td>
-        <td>{{ b.adults|add:b.children }}</td>
-        <td>{{ b.room.room_type }}</td>
-        <td>{{ b.room.floor.number }}</td>
-        <td>
-          {% if b.status == 'booked' %}
-            <span class="badge-active">Active</span>
-          {% elif b.status == 'completed' %}
-            <span class="badge-out">Checked Out</span>
-          {% else %}
-            {{ b.status }}
-          {% endif %}
-        </td>
-        <td>
-          <button class="btn-update" onclick="openModal({{ b.id }}, '{{ b.checkout_datetime|date:'Y-m-d\TH:i' }}', '{{ b.status }}')">Update</button>
-          <a href="{% url 'checkin_checkout:view_details' b.id %}">View Details</a> |
-          <a href="{% url 'checkin_checkout:invoice' b.id %}" target="_blank">Print Invoice</a>
-        </td>
-      </tr>
-      {% empty %}
-      <tr><td colspan="10">No bookings found</td></tr>
-      {% endfor %}
-    </tbody>
-  </table>
+<div class="main-content">
+    <h2 class="page-title">Check-In / Check-Out Dashboard</h2>
+
+    <!-- Search Form -->
+    <form method="get" class="search-bar">
+        <input type="text" name="q" placeholder="Search by name, phone, room, status..." value="{{ query }}">
+        <label>From:</label>
+        <input type="date" name="checkin_from" value="{{ checkin_from }}">
+        <label>To:</label>
+        <input type="date" name="checkin_to" value="{{ checkin_to }}">
+        <button type="submit">Search</button>
+        <a href="{% url 'checkin_checkout:checkin_checkout' %}" style="padding:10px 14px; background:#6b7280; color:white; border-radius:8px; text-decoration:none; font-size:14px;">Reset</a>
+    </form>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Customer</th>
+                    <th>Phone</th>
+                    <th>Room No</th>
+                    <th>Check-In</th>
+                    <th>Check-Out</th>
+                    <th>Members</th>
+                    <th>Room Type</th>
+                    <th>Floor</th>
+                    <th>Status</th>
+                    <th>View</th>
+                    <th>Update</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for b in bookings %}
+                <tr>
+                    <td>{{ b.customer_name }}</td>
+                    <td>{{ b.phone_number }}</td>
+                    <td>{{ b.room.room_number }}</td>
+                    <td>{% if b.checkin_datetime %}{{ b.checkin_datetime|date:"Y-m-d H:i" }}{% else %}-{% endif %}</td>
+                    <td>{% if b.checkout_datetime %}{{ b.checkout_datetime|date:"Y-m-d H:i" }}{% else %}-{% endif %}</td>
+                    <td>{{ b.adults|add:b.children }}</td>
+                    <td>{{ b.room.room_type }}</td>
+                    <td>{{ b.room.floor.number }}</td>
+                    <td>
+                        {% if b.status == 'completed' %}
+                            <span class="badge-out">Checked Out</span>
+                        {% else %}
+                            <span class="badge-active">Active</span>
+                        {% endif %}
+                    </td>
+                    <td><a href="{% url 'checkin_checkout:view_details' b.id %}" class="btn-view">View</a></td>
+                    <td>
+                        <button class="btn-update" onclick="openModal({{ b.id }}, '{{ b.checkout_datetime|date:'Y-m-d\\TH:i' }}', '{{ b.status }}')">Update</button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="11" style="text-align:center;">No bookings found</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<!-- Modal -->
+<!-- Update Modal -->
 <div id="updateModal" class="modal">
-  <div class="modal-content">
-    <button class="close-btn" onclick="closeModal()">×</button>
-    <h3>Update Checkout & Status</h3>
-    <form id="updateForm" method="post">
-      {% csrf_token %}
-      <label for="checkout_datetime">Checkout Date & Time:</label>
-      <input type="datetime-local" id="checkout_datetime" name="checkout_datetime" required>
-
-      <label for="status">Status:</label>
-      <select id="status" name="status" required>
-        <option value="booked">Active</option>
-        <option value="completed">Checked Out</option>
-      </select>
-
-      <button type="submit" class="save-btn">Save</button>
-    </form>
-  </div>
+    <div class="modal-content">
+        <button class="close-btn" onclick="closeModal()">×</button>
+        <h3>Update Checkout & Status</h3>
+        <form id="updateForm" method="post">
+            {% csrf_token %}
+            <label for="checkout_datetime">Checkout Date & Time:</label>
+            <input type="datetime-local" id="checkout_datetime" name="checkout_datetime" required>
+            <label for="status">Status:</label>
+            <select id="status" name="status" required>
+                <option value="booked">Active</option>
+                <option value="completed">Checked Out</option>
+            </select>
+            <button type="submit" class="save-btn">Save</button>
+        </form>
+    </div>
 </div>
 
 <script>
 function openModal(id, checkout, status) {
-  document.getElementById('updateModal').style.display = 'flex';
-  document.getElementById('checkout_datetime').value = checkout || '';
-  document.getElementById('status').value = status || 'booked';
-  document.getElementById('updateForm').action = '/checkin_checkout/update_checkout/' + id + '/';
+    document.getElementById('updateModal').style.display = 'flex';
+    document.getElementById('checkout_datetime').value = checkout || '';
+    document.getElementById('status').value = status || 'booked';
+    document.getElementById('updateForm').action = '/checkin_checkout/update_checkout/' + id + '/';
 }
-
-function closeModal() {
-  document.getElementById('updateModal').style.display = 'none';
-}
-
-window.onclick = function(event) {
-  const modal = document.getElementById('updateModal');
-  if(event.target === modal) {
-    closeModal();
-  }
-}
+function closeModal() { document.getElementById('updateModal').style.display = 'none'; }
+window.onclick = function(e) { if(e.target === document.getElementById('updateModal')) closeModal(); }
 </script>
 {% endblock %}

@@ -1,0 +1,295 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}User Management - KC Resort{% endblock %}
+
+{% block extra_head %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<style>
+  body {
+    background-color: #f0f2f5;
+    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #1c1e21;
+  }
+
+  h2, h4 {
+    font-weight: 600;
+    color: #050505;
+  }
+
+  .card {
+    border: none;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    background: #fff;
+  }
+
+  .card-title {
+    font-weight: 600;
+    color: #050505;
+  }
+
+  .badge-green {
+    background-color: #42b72a;
+    color: #fff;
+    font-weight: 500;
+    padding: 5px 12px;
+    border-radius: 14px;
+  }
+
+  .badge-red {
+    background-color: #f02849;
+    color: #fff;
+    font-weight: 500;
+    padding: 5px 12px;
+    border-radius: 14px;
+  }
+
+  .badge-gray {
+    background-color: #e4e6eb;
+    color: #050505;
+    font-weight: 500;
+    padding: 5px 12px;
+    border-radius: 14px;
+  }
+
+  .table {
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .table thead {
+    background-color: #f5f6f7;
+    font-weight: 600;
+  }
+
+  .table tbody tr:hover {
+    background-color: #f2f2f2;
+  }
+
+  .btn-success {
+    background-color: #1877f2;
+    border: none;
+    font-weight: 600;
+    border-radius: 10px;
+    padding: 10px 18px;
+    box-shadow: 0 2px 6px rgba(24, 119, 242, 0.4);
+  }
+
+  .btn-success:hover {
+    background-color: #166fe5;
+  }
+
+  .btn-primary {
+    background-color: #1877f2;
+    border: none;
+    font-weight: 600;
+    border-radius: 10px;
+    padding: 10px 18px;
+  }
+
+  .btn-primary:hover {
+    background-color: #166fe5;
+  }
+
+  .btn-secondary {
+    background-color: #e4e6eb;
+    color: #050505;
+    border: none;
+    font-weight: 600;
+    border-radius: 10px;
+    padding: 10px 18px;
+  }
+
+  /* LUXURY MODAL STYLE */
+  .modal-content {
+    border-radius: 16px;
+    border: none;
+    background: #ffffffcc; 
+    backdrop-filter: blur(12px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.25);
+    padding: 2rem;
+    max-width: 600px;
+    margin: auto;
+  }
+
+  .modal-header {
+    border-bottom: none;
+    justify-content: center;
+  }
+
+  .modal-title {
+    font-weight: 700;
+    font-size: 1.6rem;
+    color: #050505;
+    text-align: center;
+  }
+
+  .modal-body {
+    padding-top: 1rem;
+  }
+
+  .form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 18px;
+  }
+
+  .form-group label {
+    width: 30%;
+    font-weight: 600;
+    color: #050505;
+    padding-right: 15px;
+    text-align: right;
+  }
+
+  .form-group input {
+    width: 70%;
+    border-radius: 10px;
+    border: 1px solid #ccd0d5;
+    padding: 10px 12px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease-in-out;
+  }
+
+  .form-group input:focus {
+    border-color: #1877f2;
+    box-shadow: 0 0 0 5px rgba(24, 119, 242, 0.2);
+    outline: none;
+    background-color: #fff;
+  }
+
+  .alert-danger {
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+  }
+
+  .modal-footer {
+    border-top: none;
+    justify-content: flex-start;
+    gap: 10px;
+    padding-top: 1.5rem;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4">User Management</h2>
+
+  <!-- Logged-in Admin Info -->
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title">Logged-in Staff</h5>
+      <p><strong>Name:</strong> {{ request.user.username }}</p>
+      <p><strong>Role:</strong> {{ request.user.role|capfirst }}</p>
+      <p><strong>Permissions:</strong>
+        {% if request.user.is_admin or request.user.is_subadmin %}
+          <span class="badge-green">Full Access</span>
+        {% else %}
+          <span class="badge-gray">Limited</span>
+        {% endif %}
+      </p>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="mb-0">Assign Permissions</h4>
+    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addUserModal">
+    Add New User
+    </button>
+  </div>
+
+  <!-- Users Table -->
+  <div class="card">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table mb-0">
+          <thead>
+            <tr>
+              <th>Staff Name</th>
+              <th>Role</th>
+              <th>Room Mgmt</th>
+              <th>Bookings</th>
+              <th>Payments</th>
+              <th>Reports</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in users %}
+            <tr>
+              <td>{{ user.username }}</td>
+              <td>{{ user.role|capfirst }}</td>
+              <td>
+                {% if user.role != 'receptionist' %}
+                  <span class="badge-green">Access</span>
+                {% else %}
+                  <span class="badge-red">No Access</span>
+                {% endif %}
+              </td>
+              <td><span class="badge-green">Access</span></td>
+              <td>
+                {% if user.role == 'accountant' %}
+                  <span class="badge-green">Access</span>
+                {% else %}
+                  <span class="badge-red">No Access</span>
+                {% endif %}
+              </td>
+              <td><span class="badge-gray">Pending</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6" class="text-center">No users found.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Add New User -->
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <form class="modal-content" method="POST" action="{% url 'accounts:create-receptionist' %}">
+      {% csrf_token %}
+      <div class="modal-header">
+        <h5 class="modal-title" id="addUserModalLabel">Create New User</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <div class="form-group">
+          <label for="{{ form.username.id_for_label }}">Username</label>
+          {{ form.username }}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.email.id_for_label }}">Email</label>
+          {{ form.email }}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.password.id_for_label }}">Password</label>
+          {{ form.password }}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.confirm_password.id_for_label }}">Confirm Password</label>
+          {{ form.confirm_password }}
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Create User</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+{% endblock %}

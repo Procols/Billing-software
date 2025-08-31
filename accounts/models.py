@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 
+
 class UserManager(BaseUserManager):
     use_in_migrations = True
 
@@ -14,18 +15,19 @@ class UserManager(BaseUserManager):
         return user
 
     def create_user(self, username, email=None, password=None, role='receptionist', **extra_fields):
+        # Regular users are not staff/superuser
         extra_fields.setdefault('is_staff', False)
         extra_fields.setdefault('is_superuser', False)
         return self._create_user(username, email, password, role, **extra_fields)
 
     def create_superuser(self, username, email=None, password=None, **extra_fields):
+        # Superuser is always admin
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
-        role = 'admin'  # superusers are admins by default
+        role = User.ROLE_ADMIN
 
         if extra_fields.get('is_staff') is not True:
             raise ValueError('Superuser must have is_staff=True.')
-
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser must have is_superuser=True.')
 
@@ -34,25 +36,33 @@ class UserManager(BaseUserManager):
 
 class User(AbstractUser):
     ROLE_ADMIN = 'admin'
+    ROLE_SUBADMIN = 'subadmin'
     ROLE_RECEPTIONIST = 'receptionist'
 
     ROLE_CHOICES = [
         (ROLE_ADMIN, 'Admin'),
+        (ROLE_SUBADMIN, 'Sub Admin'),
         (ROLE_RECEPTIONIST, 'Receptionist'),
     ]
 
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default=ROLE_RECEPTIONIST)
+    
 
-    objects = UserManager()  # assign custom manager
+    objects = UserManager()
 
     def save(self, *args, **kwargs):
-        # Make sure role is admin if user is superuser
+        # Superusers are always "admin" role
         if self.is_superuser:
             self.role = self.ROLE_ADMIN
+            self.is_staff = True
         super().save(*args, **kwargs)
 
+    # Convenience helpers
     def is_admin(self):
         return self.role == self.ROLE_ADMIN
+
+    def is_subadmin(self):
+        return self.role == self.ROLE_SUBADMIN
 
     def is_receptionist(self):
         return self.role == self.ROLE_RECEPTIONIST

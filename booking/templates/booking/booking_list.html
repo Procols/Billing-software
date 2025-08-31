@@ -2,20 +2,55 @@
 {% block title %}Booking Overview{% endblock %}
 {% block extra_head %}
 <style>
-h1{text-align:center;color:#1f2937}
-.table-wrap { background:white; padding:20px; border-radius:8px; box-shadow:0 4px 10px rgba(0,0,0,0.05); }
-table{ width:100%; border-collapse:collapse; }
-th,td{ padding:10px; border-bottom:1px solid #e5e7eb; text-align:left; }
-.btn-primary{ background:#2563eb;color:white;padding:8px 12px;border-radius:6px;text-decoration:none; }
-.floating-btn{ position:fixed; bottom:30px; right:30px; background:#2563eb; color:white; padding:16px 18px; border-radius:50px; box-shadow:0 4px 10px rgba(0,0,0,0.15); }
+body { font-family: 'Inter', sans-serif; background:#f9fafb; }
+h1{text-align:center;color:#111827;margin-bottom:20px;font-size:28px;}
+.table-wrap { background:white; padding:20px; border-radius:12px; box-shadow:0 6px 14px rgba(0,0,0,0.06); }
+table{ width:100%; border-collapse:collapse; font-size:14px; }
+th,td{ padding:12px; border-bottom:1px solid #e5e7eb; text-align:left; }
+th{ background:#f3f4f6; font-weight:600; color:#374151; }
+tr:hover{ background:#f9fafb; }
+.btn-primary{ background:#2563eb;color:white;padding:10px 16px;border-radius:8px;text-decoration:none; font-weight:600; }
+.floating-btn{ position:fixed; bottom:30px; right:30px; background:#2563eb; color:white; padding:16px 20px; border-radius:50px; box-shadow:0 6px 16px rgba(0,0,0,0.2); font-weight:600; }
+.filter-bar{ display:flex; gap:10px; margin-bottom:15px; justify-content:space-between; flex-wrap:wrap; }
+.filter-btn{ padding:8px 14px; border-radius:8px; border:1px solid #d1d5db; background:#f9fafb; cursor:pointer; font-weight:500; }
+.filter-btn.active{ background:#2563eb; color:white; border:none; }
+.search-box input{ padding:8px 14px; border-radius:8px; border:1px solid #d1d5db; width:220px; }
+.badge-paid { background:#10b981; color:white; padding:4px 8px; border-radius:6px; font-size:12px; }
+.badge-pending { background:#f59e0b; color:white; padding:4px 8px; border-radius:6px; font-size:12px; }
+.badge-cancelled { background:#ef4444; color:white; padding:4px 8px; border-radius:6px; font-size:12px; }
 </style>
 {% endblock %}
+
 {% block content %}
 <h1>Booking Overview - KC Resort</h1>
 <div class="table-wrap">
-  <a href="{% url 'booking:new_booking' %}" class="btn-primary">+ New Booking</a>
-  <table style="margin-top:12px">
-    <thead><tr><th>Invoice</th><th>Customer</th><th>Status</th><th>Room</th><th>Type</th><th>Check-in</th><th>Check-out</th></tr></thead>
+  
+  <!-- 🔘 Filter + Search -->
+  <form method="get" class="filter-bar">
+    <div>
+      <button type="submit" name="status" value="all" class="filter-btn {% if status_filter == 'all' %}active{% endif %}">All</button>
+      <button type="submit" name="status" value="booked" class="filter-btn {% if status_filter == 'booked' %}active{% endif %}">Booked</button>
+      <button type="submit" name="status" value="pre_booked" class="filter-btn {% if status_filter == 'pre_booked' %}active{% endif %}">Pre-booked</button>
+    </div>
+    <div class="search-box">
+      <input type="text" name="q" placeholder="Search booking..." value="{{ query }}">
+    </div>
+  </form>
+
+  <!-- 📋 Booking Table -->
+  <table>
+    <thead>
+      <tr>
+        <th>Invoice</th>
+        <th>Customer</th>
+        <th>Status</th>
+        <th>Room</th>
+        <th>Type</th>
+        <th>Check-in</th>
+        <th>Check-out</th>
+        <th>Payment</th>
+      </tr>
+    </thead>
     <tbody>
       {% for b in bookings %}
         <tr>
@@ -26,7 +61,15 @@ th,td{ padding:10px; border-bottom:1px solid #e5e7eb; text-align:left; }
           <td>{{ b.room.room_type }}</td>
           <td>{{ b.checkin_datetime|date:"Y-m-d H:i" }}</td>
           <td>{% if b.checkout_datetime %}{{ b.checkout_datetime|date:"Y-m-d H:i" }}{% else %}-{% endif %}</td>
-          
+          <td>
+            {% if b.payment_status == 'paid' %}
+              <span class="badge-paid">Paid</span>
+            {% elif b.payment_status == 'pending' %}
+              <span class="badge-pending">Pending</span>
+            {% else %}
+              <span class="badge-cancelled">Cancelled</span>
+            {% endif %}
+          </td>
         </tr>
       {% empty %}
         <tr><td colspan="8" style="text-align:center;">No records available</td></tr>
@@ -34,4 +77,7 @@ th,td{ padding:10px; border-bottom:1px solid #e5e7eb; text-align:left; }
     </tbody>
   </table>
 </div>
+
+<!-- ➕ Floating Add Booking Button -->
+<a href="{% url 'booking:new_booking' %}" class="floating-btn">+ New</a>
 {% endblock %}

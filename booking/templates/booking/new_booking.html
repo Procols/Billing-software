@@ -38,7 +38,8 @@ button { margin-top:30px; width:100%; padding:12px; font-weight:700; border:none
       AC Type: <span id="acType"></span><br>
       Floor: <span id="floor"></span><br>
       Status: <span id="roomStatus"></span><br>
-      Price (₹): <span id="roomPrice">0.00</span>
+      Price (₹): <span id="roomPrice">0.00</span><br>
+      <strong>Total (with GST if applied): ₹<span id="finalPrice">0.00</span></strong>
     </div>
 
     <label>Adults</label> {{ form.adults }}
@@ -48,7 +49,9 @@ button { margin-top:30px; width:100%; padding:12px; font-weight:700; border:none
     <label>Check-out Date & Time (optional)</label> {{ form.checkout_datetime }}
 
     <label>Payment Type</label> {{ form.payment_type }}
-    <label style="margin-top:12px;">{{ form.apply_gst }} Apply GST (18%)</label>
+    <label>Payment Status</label> {{ form.payment_status }}
+
+    <label style="margin-top:12px;">{{ form.apply_gst }} Apply GST</label>
 
     <button type="submit">Save Booking</button>
   </form>
@@ -56,12 +59,31 @@ button { margin-top:30px; width:100%; padding:12px; font-weight:700; border:none
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-function updatePrice(basePrice) {
+function updatePrice(basePrice, days=1) {
   const gstApplied = $("#id_apply_gst").is(":checked");
-  let finalPrice = basePrice;
-  if (gstApplied) finalPrice = basePrice + (basePrice * 0.18);
-  $("#roomPrice").text(finalPrice.toFixed(2));
+  const totalRoomPrice = basePrice * days;
+  let finalPrice = totalRoomPrice;
+
+  if (gstApplied) {
+    let gstRate = (totalRoomPrice < 7000) ? 0.12 : 0.18;
+    finalPrice = totalRoomPrice + (totalRoomPrice * gstRate);
+  }
+
+  $("#roomPrice").text(totalRoomPrice.toFixed(2));
+  $("#finalPrice").text(finalPrice.toFixed(2));
   $("#roomPrice").data('basePrice', basePrice);
+}
+
+function calculateDays() {
+  const checkin = $("#id_checkin_datetime").val();
+  const checkout = $("#id_checkout_datetime").val();
+  if (checkin && checkout) {
+    const start = new Date(checkin);
+    const end = new Date(checkout);
+    let diff = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+    return diff > 0 ? diff : 1;
+  }
+  return 1;
 }
 
 $("#roomNumber").change(function () {
@@ -73,14 +95,16 @@ $("#roomNumber").change(function () {
       $("#acType").text(data.ac_type);
       $("#floor").text(data.floor);
       $("#roomStatus").text(data.status);
-      updatePrice(data.price);
+      let days = calculateDays();
+      updatePrice(data.price, days);
       $("#roomDetails").show();
     }).fail(function(){ alert("Failed to fetch room details"); $("#roomDetails").hide(); });
 });
 
-$("#id_apply_gst").change(function(){
+$("#id_apply_gst, #id_checkin_datetime, #id_checkout_datetime").change(function(){
   let base = $("#roomPrice").data('basePrice') || 0;
-  updatePrice(base);
+  let days = calculateDays();
+  updatePrice(base, days);
 });
 </script>
 {% endblock %}

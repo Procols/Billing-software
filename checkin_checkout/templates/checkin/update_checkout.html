@@ -1,11 +1,20 @@
 {% extends 'base.html' %}
 {% block title %}Update Checkout{% endblock %}
 {% block content %}
-<h2>Update Checkout for {{ booking.customer_name }}</h2>
-<form method="post" style="max-width:400px;">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit" class="btn btn-primary">Save</button>
-  <a href="{% url 'checkin:checkin_checkout' %}" class="btn btn-secondary" style="margin-left:10px;">Cancel</a>
-</form>
+<div class="container" style="max-width: 400px; margin-top: 30px;">
+  <h2>Update Checkout for {{ booking.customer_name }}</h2>
+
+  {% if form.errors %}
+    <div class="alert alert-danger">
+      {{ form.errors }}
+    </div>
+  {% endif %}
+
+  <form method="post" action="{% url 'checkin_checkout:update_checkout' booking.id %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a href="{% url 'checkin_checkout:checkin_checkout' %}" class="btn btn-secondary">Cancel</a>
+  </form>
+</div>
 {% endblock %}

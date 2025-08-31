@@ -22,13 +22,19 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('adminpanel/', admin.site.urls),
+    path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls', namespace='accounts')),
     path('rooms/', include('rooms.urls', namespace='rooms')),
     path('booking/', include('booking.urls', namespace='booking')),
     path('foods_drinks/', include('foods.urls', namespace='foods')),
-    path('checkin-checkout/', include('checkin_checkout.urls', namespace='checkin_checkout')),
-    path('dashboard/', include('core.urls', namespace='core')),
+    path("checkin_checkout/", include("checkin_checkout.urls")),
+    path('', include('core.urls', namespace='core')),
+    path('invoices/', include('invoices.urls', namespace='invoices')),
+    path('transaction/', include('transaction.urls', namespace='transaction')),
+    path('report/', include('report.urls', namespace='report')),
+    path('products/', include('products.urls', namespace='products')),
+    path('setting/', include('setting.urls', namespace='setting')),
+    path('tax_filling/', include('tax_filling.urls', namespace='tax_filling')),
 ]
 
 
